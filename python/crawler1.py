@@ -95,7 +95,11 @@ def save_my_db(sqls):
     count = 0
     for sql in sqls:
         # print sql
-        dbutils.update(conn, sql)
+        try:
+        	dbutils.update(conn, sql)
+    	except Exception as e:
+    		logging.info(sql)
+        	traceback.print_exc()
         count += 1
     logging.info("%d inserted" % count)
     conn.close()
@@ -178,7 +182,7 @@ def handle_single_page(url):
         o = {
             "id": id,
             "href": dom_link['href'],
-            "title": dom_link.get_text(),
+            "title": dom_link.get_text().replace("'","''"),
             "author": author,
             'create_date': create_date
         }
@@ -191,10 +195,11 @@ def handle_single_page(url):
 
 def run():
     url_base = 'http://t66y.com/thread0806.php?fid=25&search=&page='
-    for n in range(1, 100):
+    for n in range(100,200):
         url = url_base + str(n)
         handle_single_page(url)
         # time.sleep(20)
+    logging.info("done")
 
 
 def run2():
