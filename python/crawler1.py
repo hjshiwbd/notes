@@ -53,11 +53,13 @@ def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
     s = curl_get(url, proxy=True, gzip=True, headers={
-        "Host": "t66y.com",
+        "authority": "t66y.com",
+        "method": "GET",
+        "path": "/thread0806.php?fid=25",
         "Proxy-Connection": "keep-alive",
         "Cache-Control": "max-age=0",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.1 10/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -195,7 +197,7 @@ def handle_single_page(url):
 
 def run():
     url_base = 'http://t66y.com/thread0806.php?fid=25&search=&page='
-    for n in range(100,200):
+    for n in range(1,5):
         url = url_base + str(n)
         handle_single_page(url)
         # time.sleep(20)
