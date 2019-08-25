@@ -1,5 +1,19 @@
 # coding:utf-8
 # crawler for t66y, get the basic info of the posts
+"""
+create database crawler;
+CREATE TABLE `t66y_article` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `original_id` bigint(20) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `author_name` varchar(100) DEFAULT NULL,
+  `post_date` datetime DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+"""
 
 import urllib2
 import traceback
