@@ -7,13 +7,14 @@ import urllib2
 import traceback
 from bs4 import BeautifulSoup
 import sys
+import time
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 site = 'https://www.rourouwu.com'
 
-book_index_url = site + '/read/67484/'
+book_index_url = site + '/read/66361/'
 
 
 def curl_get(url, timeout=5):
@@ -48,7 +49,13 @@ def parse_href(link):
 
 
 def get_chapter(chapter_url):
-    chtml = curl_get(chapter_url).decode('gbk')
+    chtml = ""
+    try:
+        chtml = curl_get(chapter_url)
+        chtml = chtml.decode('gbk')
+    except Exception: 
+        print chapter_url
+        traceback.print_exc()
     c = BeautifulSoup(chtml, "html.parser")
     main = c.find("div", id="main")
     raw = main.find_all("div")[4].find_all("p")[2].text
@@ -56,7 +63,9 @@ def get_chapter(chapter_url):
 
 
 def run():
+    print "start"
     homepage = get_homepage()
+    print "get index done"
     # homepage = get_homepage_local()
     # print homepage
     index_page = BeautifulSoup(homepage, "html.parser")
@@ -88,6 +97,7 @@ def run():
                 output.write(cname + "\r\n\r\n" + txt + "\r\n\r\n")
                 print "%d/%d done" % (progress, ll)
                 progress += 1
+                #time.sleep(10)
         # if i > 1:
         #     break
     output.close()
