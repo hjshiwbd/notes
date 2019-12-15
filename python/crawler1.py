@@ -211,7 +211,7 @@ def handle_single_page(url):
 
 def run():
     url_base = 'http://t66y.com/thread0806.php?fid=25&search=&page='
-    for n in range(1,5):
+    for n in range(1,15):
         url = url_base + str(n)
         handle_single_page(url)
         # time.sleep(20)
