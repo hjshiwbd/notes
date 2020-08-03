@@ -28,14 +28,8 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 logging.basicConfig(level=logging.INFO,format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',datefmt='%y-%m-%d %H:%M:%S')
 
-site = 'http://www.doushuge.com'
 # is_from_local = True
 is_from_local = False
-
-# book_index_url = site + '/145/145496/index.html'
-# book_index_url = site + '/108/108747/index.html'
-# book_index_url = site + '/148/148560/index.html'
-book_index_url = site + '/8/8216/'
 
 today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
@@ -48,7 +42,7 @@ def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
         opener = urllib2.build_opener()
         if proxy:
             proxy_info = {'host': '127.0.0.1',
-                          'port': 10801}
+                          'port': 7890}
             proxy_support = urllib2.ProxyHandler({"http": "http://%(host)s:%(port)d" % proxy_info})
             opener = urllib2.build_opener(proxy_support)
 
@@ -66,7 +60,7 @@ def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    s = curl_get(url, proxy=True, gzip=True, headers={
+    s = curl_get(url, proxy=True, gzip=True, timeout=60, headers={
         "authority": "t66y.com",
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -211,15 +205,15 @@ def handle_single_page(url):
 
 def run():
     url_base = 'http://t66y.com/thread0806.php?fid=25&search=&page='
-    for n in range(1,15):
+    for n in range(1,20):
         url = url_base + str(n)
         handle_single_page(url)
-        # time.sleep(20)
+        time.sleep(10)
     logging.info("done")
 
 
 def run2():
-    print range(1, 100)
+    print range(1, 20)
 
 
 if __name__ == '__main__':
