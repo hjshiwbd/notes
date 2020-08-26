@@ -16,8 +16,8 @@ from email.utils import formataddr
 # sys.setdefaultencoding('utf-8')
 logging.basicConfig(level=logging.INFO,format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',datefmt='%y-%m-%d %H:%M:%S')
 
-is_from_local = True
-# is_from_local = False
+# is_from_local = True
+is_from_local = False
 
 toggle_price1 = 0.05
 
@@ -73,7 +73,7 @@ def get_page_html(url):
 
 
 def handle_single_page(url):
-    logging.info(url)
+    # logging.info(url)
     html = get_page_html(url)
     # print(html)
     reg = r'(?<=<p class="font12 color666 m-t5">1金\=).*(?=元</p>)';
