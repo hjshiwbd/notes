@@ -21,10 +21,7 @@ logging.basicConfig(level=logging.INFO,
 # is_from_local = True
 is_from_local = False
 
-toggle_price1 = 0.039
-
-#
-
+toggle_price1 = 0.04
 
 def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
     if headers is None:
