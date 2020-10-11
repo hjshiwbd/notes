@@ -33,6 +33,7 @@ is_from_local = False
 
 today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
+fid=0
 
 
 def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
@@ -53,14 +54,14 @@ def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
         if gzip:
             resp_html = zlib.decompress(resp_html, 16 + zlib.MAX_WBITS)
         return resp_html
-    except urllib2.URLError, e:
+    except Exception:
         traceback.print_exc()
 
 
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    s = curl_get(url, proxy=True, gzip=True, timeout=60, headers={
+    s = curl_get(url, proxy=True, gzip=True, timeout=20, headers={
         "authority": "t66y.com",
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -120,9 +121,9 @@ def get_sql(exist_id_list, articles):
     for o in articles:
         if int(o['id']) not in exist_id_list:
             sql = """
-                INSERT INTO `crawler`.`t66y_article` (`original_id`, `title`, `author_name`, `post_date`, `link` )
-            VALUES	( '%s','%s','%s','%s','%s');
-                """.strip().replace("\n", "") % (o['id'], o['title'], o['author'], o['create_date'], o['href'])
+                INSERT INTO `crawler`.`t66y_article` (`fid`,`original_id`, `title`, `author_name`, `post_date`, `link` )
+            VALUES	( '%s','%s','%s','%s','%s','%s');
+                """.strip().replace("\n", "") % (str(fid), o['id'], o['title'], o['author'], o['create_date'], o['href'])
             result.append(sql)
     return result
 
@@ -204,17 +205,19 @@ def handle_single_page(url):
 
 
 def run():
-    url_base = 'http://t66y.com/thread0806.php?fid=25&search=&page='
-    for n in range(1,20):
+    global fid
+    # 15亚有 25国 2亚无 3中文26
+    fid = 26
+    url_base = 'http://t66y.com/thread0806.php?fid='+str(fid)+'&search=&page='
+    for n in range(71,101):
         url = url_base + str(n)
         handle_single_page(url)
-        time.sleep(10)
+        time.sleep(3)
     logging.info("done")
 
 
 def run2():
     print range(1, 20)
-
 
 if __name__ == '__main__':
     run()
