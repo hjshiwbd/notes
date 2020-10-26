@@ -3,13 +3,9 @@
 #
 import logging
 import dd373
-import redis
 from bs4 import BeautifulSoup
-from utils import redis_password
-from utils import redis_port
-from utils import redis_db
+import utils
 from utils import redis_conn_master001
-from utils import redis_host
 
 url_base = 'http://www.nfuwow.com/wowtoken/index.html'
 # is_from_local = True
@@ -17,7 +13,6 @@ is_from_local = False
 
 
 def from_local():
-    # io = open('C:\\Users\\Administrator\\Desktop\\page1.html')
     io = open('C:\\Users\\Administrator\\Desktop\\dd373-1.html', encoding="utf-8")
     return ''.join([s for s in io.readlines()])
 
@@ -25,7 +20,7 @@ def from_local():
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    s = dd373.curl_get(url, proxy=False, gzip=True, timeout=60, headers={
+    s = utils.curl_get(url, proxy=False, gzip=True, timeout=60, headers={
         "authority": "t66y.com",
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -57,12 +52,13 @@ def resolve_by_bs4(html):
 
 def save_redis(rate):
     with redis_conn_master001() as r:
-        r.set('w:token:exchange_rate', rate)  # save
+        r.set(utils.redis_w_key, rate)  # save
 
 
 def handle_single_page(url):
     html = get_page_html(url)
     price = resolve_by_bs4(html)
+    logging.info(str(price))
     save_redis(price)
 
 
