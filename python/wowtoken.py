@@ -5,14 +5,15 @@ import logging
 import dd373
 import redis
 from bs4 import BeautifulSoup
+from utils import redis_password
+from utils import redis_port
+from utils import redis_db
+from utils import redis_conn_master001
+from utils import redis_host
 
 url_base = 'http://www.nfuwow.com/wowtoken/index.html'
 # is_from_local = True
 is_from_local = False
-redis_host = '101.37.146.151'
-redis_port = 11010
-redis_password = 'yuZhI_reDis_18518!'
-redis_db = 0
 
 
 def from_local():
@@ -55,8 +56,8 @@ def resolve_by_bs4(html):
 
 
 def save_redis(rate):
-    r = redis.Redis(host=redis_host, port=redis_port, password=redis_password, db=redis_db, decode_responses=True)
-    r.set('w:token:exchange_rate', rate)  # save
+    with redis_conn_master001() as r:
+        r.set('w:token:exchange_rate', rate)  # save
 
 
 def handle_single_page(url):
