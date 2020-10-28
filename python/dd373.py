@@ -10,38 +10,13 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 from bs4 import BeautifulSoup
 
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
                     datefmt='%y-%m-%d %H:%M:%S')
 
 # is_from_local = True
 is_from_local = False
-
-
-# toggle_price1 = 0.01
-
-
-# def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
-#     if headers is None:
-#         headers = {}
-#     opener = urllib.request.build_opener()
-#     if proxy:
-#         proxy_info = {'host': '127.0.0.1',
-#                       'port': 7890}
-#         proxy_support = urllib.ProxyHandler(
-#             {"http": "http://%(host)s:%(port)d" % proxy_info})
-#         opener = urllib.build_opener(proxy_support)
-#
-#     request = urllib.request.Request(url, headers=headers)
-#
-#     resp = opener.open(request, timeout=timeout)
-#     resp_html = resp.read()
-#     if gzip:
-#         resp_html = zlib.decompress(resp_html, 16 + zlib.MAX_WBITS)
-#     return resp_html
-
+toggle_rate = 0.9
 
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
@@ -75,7 +50,7 @@ def get_page_html(url):
 
 
 def get_toggle_price1():
-    return utils.get_token_rate() * 0.85
+    return utils.get_token_rate() * toggle_rate
 
 
 def resolve_by_regex(html):
@@ -108,8 +83,10 @@ def resolve_by_bs4(html):
     l2.sort(key=lambda x: x['rate'])
     logging.info(l2)
     rate = get_toggle_price1()
-    logging.info(rate)
-    if l2[0]['rate'] < rate:
+    gold_amount = float(l2['price'][0:l2['price'].index('金')])    
+    logging.info(rate+", "+gold_amount)
+
+    if l2[0]['rate'] < rate and gold_amount >= 1000:
         send_mail(str(l2[0]), str(l2[0]))
 
 
@@ -128,7 +105,9 @@ def run():
 
 
 def run2():
-    print(range(1, 20))
+    s = "200金=0.06"
+    i = s.index('金')
+    print(s[0:s.index('金')])
 
 
 def send_mail(title, content):
@@ -168,5 +147,5 @@ def send_mail(title, content):
 
 
 if __name__ == '__main__':
-    run()
-    # run2()
+    # run()
+    run2()
