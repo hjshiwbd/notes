@@ -34,7 +34,8 @@ is_from_local = False
 today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
 fid=0
-
+# 15亚有 25国 2亚无 中文26
+fids = [15,25,2,26]
 
 def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
     if headers is None:
@@ -203,21 +204,55 @@ def handle_single_page(url):
     sqls = get_sql(exist_id_list, articles)
     save_my_db(sqls)
 
+def get_queue():
+    """
+    当本日的队列
+    不存在,生成带爬取数据,爬取.并写入mysql,类似于队列
+    存在,取到队列,爬取
+    """
+    length=20
+    date = time.strftime("%y%m%d",time.localtime())
+    sql = "select * from crawler_queue where date = %(date)s"
+    cc = dbutils.query_list(conn, sql, {"date":date})
+    if len(cc) == 0:
+        arr = []
+        for id in fids:
+            for n in range(1,length):
+                arr.append({
+                    "fid":id,
+                    "page":n,
+                    "date":date,
+                })  # 子栏目id, 爬前n页数
+        sql = "INSERT INTO `crawler_queue`(`date`, `fid`, `page`) VALUES ( %(date)s, %(fid)s, %(page)s) "
+        for one in arr:
+            dbutils.update(conn, sql, one)
+        sql = "select * from crawler_queue where date = %(date)s"
+        cc = dbutils.query_list(conn, sql, {"date":date})
+    return [k for k in cc if k.status == 'new']
+
 
 def run():
-    global fid
-    # 15亚有 25国 2亚无 3中文26
-    fid = 26
-    url_base = 'http://t66y.com/thread0806.php?fid='+str(fid)+'&search=&page='
-    for n in range(71,101):
+    global fid,conn
+    conn = get_conn()
+
+    queue_list = get_queue()
+    
+    for one in queue_list:
+        fid = one.fid
+        n = one.page
+        url_base = 'http://t66y.com/thread0806.php?fid='+str(fid)+'&search=&page='
         url = url_base + str(n)
         handle_single_page(url)
         time.sleep(3)
+        sql = "update crawler_queue set status = 'done' where id = "+str(one.id)
+        dbutils.update(conn, sql)
+    conn.close()
     logging.info("done")
 
 
 def run2():
-    print range(1, 20)
+    a=time.strftime("%y%m%d",time.localtime())
+    print(a)
 
 if __name__ == '__main__':
     run()
