@@ -18,6 +18,7 @@ logging.basicConfig(level=logging.INFO,
 is_from_local = False
 toggle_rate = 0.9
 
+
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
@@ -81,13 +82,13 @@ def resolve_by_bs4(html):
             "rate": float(rate)
         })
     l2.sort(key=lambda x: x['rate'])
-    logging.info(l2)
+    # logging.info(l2)
     rate = get_toggle_price1()
-    gold_amount = float(l2['price'][0:l2['price'].index('金')])    
-    logging.info(rate+", "+gold_amount)
-
+    gold_amount = float(l2[0]['price'][0:l2[0]['price'].index('金')])
+    msg = "target={}, curr={}".format(str(rate)[0:6], l2[0])
+    logging.info(msg)
     if l2[0]['rate'] < rate and gold_amount >= 1000:
-        send_mail(str(l2[0]), str(l2[0]))
+        send_mail(msg, msg)
 
 
 def handle_single_page(url):
@@ -147,5 +148,5 @@ def send_mail(title, content):
 
 
 if __name__ == '__main__':
-    # run()
-    run2()
+    run()
+    # run2()
