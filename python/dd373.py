@@ -92,10 +92,8 @@ def resolve_by_bs4(html):
 
 
 def handle_single_page(url):
-    # logging.info(url)
     html = get_page_html(url)
     # print(html)
-    # resolve_by_regex(html)
     resolve_by_bs4(html)
 
 
