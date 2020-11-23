@@ -36,6 +36,7 @@ yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60)
 fid=0
 # 15亚有 25国 2亚无 中文26
 fids = [15,25,2,26]
+crawler_page_length=16
 
 def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
     if headers is None:
@@ -210,14 +211,13 @@ def get_queue():
     不存在,生成带爬取数据,爬取.并写入mysql,类似于队列
     存在,取到队列,爬取
     """
-    length=20
     date = time.strftime("%y%m%d",time.localtime())
     sql = "select * from crawler_queue where date = %(date)s"
     cc = dbutils.query_list(conn, sql, {"date":date})
     if len(cc) == 0:
         arr = []
         for id in fids:
-            for n in range(1,length):
+            for n in range(1,crawler_page_length+1):
                 arr.append({
                     "fid":id,
                     "page":n,
