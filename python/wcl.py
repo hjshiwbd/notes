@@ -26,7 +26,6 @@ def run():
     ops.add_experimental_option("prefs", prefs)
     # This example requires Selenium WebDriver 3.13 or newer
     with webdriver.Chrome(options=ops) as driver:
-        # wait = WebDriverWait(driver, 10)
         driver.get(url + suffix)
         WebDriverWait(driver, timeout=30).until(lambda d: d.find_element(By.ID, 'main-table-0_wrapper'))
         # a = driver.page_source
