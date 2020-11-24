@@ -1,0 +1,1432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+<script type="text/javascript" async=true>
+(function() {
+  var host = 'warcraftlogs.com';
+  var element = document.createElement('script');
+  var firstScript = document.getElementsByTagName('script')[0];
+  var url = 'https://quantcast.mgr.consensu.org'
+    .concat('/choice/', 'KvP_65z5XueLh', '/', host, '/choice.js')
+  var uspTries = 0;
+  var uspTriesLimit = 3;
+  element.async = true;
+  element.type = 'text/javascript';
+  element.src = url;
+
+  firstScript.parentNode.insertBefore(element, firstScript);
+
+  function makeStub() {
+    var TCF_LOCATOR_NAME = '__tcfapiLocator';
+    var queue = [];
+    var win = window;
+    var cmpFrame;
+
+    function addFrame() {
+      var doc = win.document;
+      var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+
+      if (!otherCMP) {
+        if (doc.body) {
+          var iframe = doc.createElement('iframe');
+
+          iframe.style.cssText = 'display:none';
+          iframe.name = TCF_LOCATOR_NAME;
+          doc.body.appendChild(iframe);
+        } else {
+          setTimeout(addFrame, 5);
+        }
+      }
+      return !otherCMP;
+    }
+
+    function tcfAPIHandler() {
+      var gdprApplies;
+      var args = arguments;
+
+      if (!args.length) {
+        return queue;
+      } else if (args[0] === 'setGdprApplies') {
+        if (
+          args.length > 3 &&
+          args[2] === 2 &&
+          typeof args[3] === 'boolean'
+        ) {
+          gdprApplies = args[3];
+          if (typeof args[2] === 'function') {
+            args[2]('set', true);
+          }
+        }
+      } else if (args[0] === 'ping') {
+        var retr = {
+          gdprApplies: gdprApplies,
+          cmpLoaded: false,
+          cmpStatus: 'stub'
+        };
+
+        if (typeof args[2] === 'function') {
+          args[2](retr);
+        }
+      } else {
+        queue.push(args);
+      }
+    }
+
+    function postMessageEventHandler(event) {
+      var msgIsString = typeof event.data === 'string';
+      var json = {};
+
+      try {
+        if (msgIsString) {
+          json = JSON.parse(event.data);
+        } else {
+          json = event.data;
+        }
+      } catch (ignore) {}
+
+      var payload = json.__tcfapiCall;
+
+      if (payload) {
+        window.__tcfapi(
+          payload.command,
+          payload.version,
+          function(retValue, success) {
+            var returnMsg = {
+              __tcfapiReturn: {
+                returnValue: retValue,
+                success: success,
+                callId: payload.callId
+              }
+            };
+            if (msgIsString) {
+              returnMsg = JSON.stringify(returnMsg);
+            }
+            event.source.postMessage(returnMsg, '*');
+          },
+          payload.parameter
+        );
+      }
+    }
+
+    while (win) {
+      try {
+        if (win.frames[TCF_LOCATOR_NAME]) {
+          cmpFrame = win;
+          break;
+        }
+      } catch (ignore) {}
+
+      if (win === window.top) {
+        break;
+      }
+      win = win.parent;
+    }
+    if (!cmpFrame) {
+      addFrame();
+      win.__tcfapi = tcfAPIHandler;
+      win.addEventListener('message', postMessageEventHandler, false);
+    }
+  };
+
+  makeStub();
+
+  var uspStubFunction = function() {
+    var arg = arguments;
+    if (typeof window.__uspapi !== uspStubFunction) {
+      setTimeout(function() {
+        if (typeof window.__uspapi !== 'undefined') {
+          window.__uspapi.apply(window.__uspapi, arg);
+        }
+      }, 500);
+    }
+  };
+
+  var checkIfUspIsReady = function() {
+    uspTries++;
+    if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+      console.warn('USP is not accessible');
+    } else {
+      clearInterval(uspInterval);
+    }
+  };
+
+  if (typeof window.__uspapi === 'undefined') {
+    window.__uspapi = uspStubFunction;
+    var uspInterval = setInterval(checkIfUspIsReady, 6000);
+  }
+})();
+</script>
+<!-- End Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={licenseKey:"05fe91986a",applicationID:"752138690"};window.NREUM||(NREUM={}),__nr_require=function(e,t,n){function r(n){if(!t[n]){var i=t[n]={exports:{}};e[n][0].call(i.exports,function(t){var i=e[n][1][t];return r(i||t)},i,i.exports)}return t[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<n.length;i++)r(n[i]);return r}({1:[function(e,t,n){function r(){}function i(e,t,n){return function(){return o(e,[u.now()].concat(c(arguments)),t?null:this,n),t?void 0:this}}var o=e("handle"),a=e(6),c=e(7),f=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var d=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],p="api-",l=p+"ixn-";a(d,function(e,t){s[t]=i(p+t,!0,"api")}),s.addPageAction=i(p+"addPageAction",!0),s.setCurrentRouteName=i(p+"routeName",!0),t.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,t){var n={},r=this,i="function"==typeof t;return o(l+"tracer",[u.now(),e,n],r),function(){if(f.emit((i?"":"no-")+"fn-start",[u.now(),r,i],n),i)try{return t.apply(this,arguments)}catch(e){throw f.emit("fn-err",[arguments,this,e],n),e}finally{f.emit("fn-end",[u.now()],n)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,t){m[t]=i(l+t)}),newrelic.noticeError=function(e,t){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,t])}},{}],2:[function(e,t,n){function r(){return c.exists&&performance.now?Math.round(performance.now()):(o=Math.max((new Date).getTime(),o))-a}function i(){return o}var o=(new Date).getTime(),a=o,c=e(8);t.exports=r,t.exports.offset=a,t.exports.getLastTimestamp=i},{}],3:[function(e,t,n){function r(e,t){var n=e.getEntries();n.forEach(function(e){"first-paint"===e.name?d("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&d("timing",["fcp",Math.floor(e.startTime)])})}function i(e,t){var n=e.getEntries();n.length>0&&d("lcp",[n[n.length-1]])}function o(e){e.getEntries().forEach(function(e){e.hadRecentInput||d("cls",[e])})}function a(e){if(e instanceof m&&!g){var t=Math.round(e.timeStamp),n={type:e.type};t<=p.now()?n.fid=p.now()-t:t>p.offset&&t<=Date.now()?(t-=p.offset,n.fid=p.now()-t):t=p.now(),g=!0,d("timing",["fi",t,n])}}function c(e){d("pageHide",[p.now(),e])}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var f,u,s,d=e("handle"),p=e("loader"),l=e(5),m=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){f=new PerformanceObserver(r);try{f.observe({entryTypes:["paint"]})}catch(v){}u=new PerformanceObserver(i);try{u.observe({entryTypes:["largest-contentful-paint"]})}catch(v){}s=new PerformanceObserver(o);try{s.observe({type:"layout-shift",buffered:!0})}catch(v){}}if("addEventListener"in document){var g=!1,y=["click","keydown","mousedown","pointerdown","touchstart"];y.forEach(function(e){document.addEventListener(e,a,!1)})}l(c)}},{}],4:[function(e,t,n){function r(e,t){if(!i)return!1;if(e!==i)return!1;if(!t)return!0;if(!o)return!1;for(var n=o.split("."),r=t.split("."),a=0;a<r.length;a++)if(r[a]!==n[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var c=navigator.userAgent,f=c.match(a);f&&c.indexOf("Chrome")===-1&&c.indexOf("Chromium")===-1&&(i="Safari",o=f[1])}t.exports={agent:i,version:o,match:r}},{}],5:[function(e,t,n){function r(e){function t(){e(a&&document[a]?document[a]:document[i]?"hidden":"visible")}"addEventListener"in document&&o&&document.addEventListener(o,t,!1)}t.exports=r;var i,o,a;"undefined"!=typeof document.hidden?(i="hidden",o="visibilitychange",a="visibilityState"):"undefined"!=typeof document.msHidden?(i="msHidden",o="msvisibilitychange"):"undefined"!=typeof document.webkitHidden&&(i="webkitHidden",o="webkitvisibilitychange",a="webkitVisibilityState")},{}],6:[function(e,t,n){function r(e,t){var n=[],r="",o=0;for(r in e)i.call(e,r)&&(n[o]=t(r,e[r]),o+=1);return n}var i=Object.prototype.hasOwnProperty;t.exports=r},{}],7:[function(e,t,n){function r(e,t,n){t||(t=0),"undefined"==typeof n&&(n=e?e.length:0);for(var r=-1,i=n-t||0,o=Array(i<0?0:i);++r<i;)o[r]=e[t+r];return o}t.exports=r},{}],8:[function(e,t,n){t.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,t,n){function r(){}function i(e){function t(e){return e&&e instanceof r?e:e?f(e,c,o):o()}function n(n,r,i,o){if(!p.aborted||o){e&&e(n,r,i);for(var a=t(i),c=v(n),f=c.length,u=0;u<f;u++)c[u].apply(a,r);var d=s[w[n]];return d&&d.push([b,n,r,a]),a}}function l(e,t){h[e]=v(e).concat(t)}function m(e,t){var n=h[e];if(n)for(var r=0;r<n.length;r++)n[r]===t&&n.splice(r,1)}function v(e){return h[e]||[]}function g(e){return d[e]=d[e]||i(n)}function y(e,t){u(e,function(e,n){t=t||"feature",w[n]=t,t in s||(s[t]=[])})}var h={},w={},b={on:l,addEventListener:l,removeEventListener:m,emit:n,get:g,listeners:v,context:t,buffer:y,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(p.aborted=!0,s=p.backlog={})}var c="nr@context",f=e("gos"),u=e(6),s={},d={},p=t.exports=i();p.backlog=s},{}],gos:[function(e,t,n){function r(e,t,n){if(i.call(e,t))return e[t];var r=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,t,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[t]=r,r}var i=Object.prototype.hasOwnProperty;t.exports=r},{}],handle:[function(e,t,n){function r(e,t,n,r){i.buffer([e],r),i.emit(e,t,n)}var i=e("ee").get("handle");t.exports=r,r.ee=i},{}],id:[function(e,t,n){function r(e){var t=typeof e;return!e||"object"!==t&&"function"!==t?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");t.exports=r},{}],loader:[function(e,t,n){function r(){if(!E++){var e=b.info=NREUM.info,t=p.getElementsByTagName("script")[0];if(setTimeout(u.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&t))return u.abort();f(h,function(t,n){e[t]||(e[t]=n)});var n=a();c("mark",["onload",n+b.offset],null,"api"),c("timing",["load",n]);var r=p.createElement("script");r.src="https://"+e.agent,t.parentNode.insertBefore(r,t)}}function i(){"complete"===p.readyState&&o()}function o(){c("mark",["domContent",a()+b.offset],null,"api")}var a=e(2),c=e("handle"),f=e(6),u=e("ee"),s=e(4),d=window,p=d.document,l="addEventListener",m="attachEvent",v=d.XMLHttpRequest,g=v&&v.prototype;NREUM.o={ST:setTimeout,SI:d.setImmediate,CT:clearTimeout,XHR:v,REQ:d.Request,EV:d.Event,PR:d.Promise,MO:d.MutationObserver};var y=""+location,h={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1184.min.js"},w=v&&g&&g[l]&&!/CriOS/.test(navigator.userAgent),b=t.exports={offset:a.getLastTimestamp(),now:a,origin:y,features:{},xhrWrappable:w,userAgent:s};e(1),e(3),p[l]?(p[l]("DOMContentLoaded",o,!1),d[l]("load",r,!1)):(p[m]("onreadystatechange",i),d[m]("onload",r)),c("mark",["firstbyte",a.getLastTimestamp()],null,"api");var E=0},{}],"wrap-function":[function(e,t,n){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(7),a="nr@original",c=Object.prototype.hasOwnProperty,f=!1;t.exports=function(e,t){function n(e,t,n,i){function nrWrapper(){var r,a,c,f;try{a=this,r=o(arguments),c="function"==typeof n?n(r,a):n||{}}catch(u){p([u,"",[r,a,i],c])}s(t+"start",[r,a,i],c);try{return f=e.apply(a,r)}catch(d){throw s(t+"err",[r,a,d],c),d}finally{s(t+"end",[r,a,f],c)}}return r(e)?e:(t||(t=""),nrWrapper[a]=e,d(e,nrWrapper),nrWrapper)}function u(e,t,i,o){i||(i="");var a,c,f,u="-"===i.charAt(0);for(f=0;f<t.length;f++)c=t[f],a=e[c],r(a)||(e[c]=n(a,u?c+i:i,o,c))}function s(n,r,i){if(!f||t){var o=f;f=!0;try{e.emit(n,r,i,t)}catch(a){p([a,n,r,i])}f=o}}function d(e,t){if(Object.defineProperty&&Object.keys)try{var n=Object.keys(e);return n.forEach(function(n){Object.defineProperty(t,n,{get:function(){return e[n]},set:function(t){return e[n]=t,t}})}),t}catch(r){p([r])}for(var i in e)c.call(e,i)&&(t[i]=e[i]);return t}function p(t){try{e.emit("internal-error",t)}catch(n){}}return e||(e=i),n.inPlace=u,n.flag=a,n}},{}]},{},["loader"]);</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 
+
+    <meta name="keywords" content="World of Warcraft, WoW, MMO, MMORPG, Games, Raid, Combatlog, DPS, Blizzard, Final Fantasy, WildStar, Elder Scrolls, Video Games, Multiplayer, Online Games, Mods, Trion, Rift">
+        <title>Warcraft Logs - Combat Analysis for Warcraft</title>
+    
+    <link type="text/css" href="https://assets.rpglogs.com/css/global.min.css?v=19" rel="stylesheet" />
+    <link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css" rel="stylesheet" type="text/css" />
+
+    <link rel="icon" type="image/png" href="https://assets.rpglogs.com/img/warcraft/favicon.png" />
+
+    <link type="text/css" href="https://assets.rpglogs.com/css/guild.css?v=11" rel="stylesheet"/>
+
+<style>
+.fg-toolbar { background:none !important; text-align:right; border:none !important; }
+th { outline-style: none !important; cursor: default; padding: 2px; }
+#reports-table { border-collapse: collapse; background-color: black; border-radius:0; width:100% !important }
+#reports-table td { padding: 2px 6px 2px; border: 1px solid #333333; white-space: nowrap }
+#reports-table th { padding: 2px 6px 2px; white-space:nowrap; }
+#reports-table span.ui-icon { float: right; margin-left:-2px }
+tr.even { background-color: #101010; }
+tr.totals { background-color: #202020; }
+tr.odd:hover td, tr.even:hover td { background-color:#101030 !important; }
+#reports-table { font-size: 12px; }
+#reports-table tr { cursor: default; }
+#teams-menubar { position:relative; margin:5px }
+#teams-menubar > li > a { padding-top:1px !important; padding-bottom:1px !important; }
+</style>
+    <style>
+    /* Tighten up scrollers in reports pages */
+    .mCSB_inside > .mCSB_container { margin-right:20px !important }
+    .mCSB_inside > .mCSB_container.mCS_no_scrollbar_y.mCS_y_hidden { margin-right:0 !important }
+    .search-white { color: white; font-size:22px; }
+    .searchbutton-mini-image { padding-left:7px; padding-top:3px; }
+    .compact-search-container { height:36px; display:flex; align-items:center; }
+    .search-compact { font-size:28px; margin-top:-3px; }
+    .zmdi-hc-spin { animation: zmdi-spin 2.5s infinite linear; }
+    .edge-hide { opacity: 0.01; }
+    
+    #qc-cmp2-persistent-link { left:0; right:auto; font-size:10px; background-color:#300040 }
+    .logo-container { width:auto !important; }
+    </style>
+
+<script data-cfasync="false" type="text/javascript">
+  var freestar = freestar || {};
+  freestar.hitTime = Date.now();
+  freestar.queue = freestar.queue || [];
+  freestar.config = freestar.config || {};
+  freestar.debug = window.location.search.indexOf('fsdebug') === -1 ? false : true;
+
+  // Tag IDs set here, must match Tags served in the Body for proper setup
+  freestar.config.enabled_slots = [
+    "warcraftlogs_728x90_970x90_970x250_320x50_ATF",
+      "warcraftlogs_728x90_970x90_970x250_320x50_BTF"
+  ];
+
+  !function(a,b){var c=b.getElementsByTagName("script")[0],d=b.createElement("script"),e="https://a.pub.network/warcraftlogs-com";e+=freestar.debug?"/qa/pubfig.min.js":"/pubfig.min.js",d.async=!0,d.src=e,c.parentNode.insertBefore(d,c)}(window,document);
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-beta.2/lazyload.min.js"></script>
+
+    <script>
+    jQuery.browser = {};
+(function () {
+    jQuery.browser.msie = false;
+    jQuery.browser.version = 0;
+    if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+        jQuery.browser.msie = true;
+        jQuery.browser.version = RegExp.$1;
+    }
+})();
+    
+    function edgeRevert() { $(".edge-hide").css('transform', ''); $(".edge-hide").removeClass('edge-hide'); }
+    function edgeZoom() { $(".edge-hide").css('transform', 'scale(2)'); setTimeout(edgeRevert, 50); }
+    function edgeSpriteFix(container) { 
+        if (navigator.userAgent.indexOf("Edge") == -1)
+            return
+        var selector = (container ? container + ' ' : '') + ".sprite"
+        $(selector).addClass('edge-hide')
+        setTimeout(edgeZoom, 10)
+    }
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/2.2.2/moment-duration-format.min.js"></script>
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/malihu-custom-scrollbar-plugin-with-iframe-fix@3.1.6/jquery.mCustomScrollbar.min.js"></script>
+
+    <script src="https://assets.rpglogs.com/js/global.min.js?v=2"></script>
+
+    <script>
+    moment.locale("en");
+    </script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/ju/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/r-2.2.2/datatables.min.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        var sortColumns = [[2, "desc"]]
+        
+        $('#reports-table').dataTable({"responsive": { "details": false }, "bJQueryUI": true,  "bPaginate": false, "aaSorting": sortColumns,
+        "bLengthChange": false,
+        "bFilter": false,
+        "bInfo": false,
+        "dom": 'tB',
+        "buttons": [ 'csv' ]
+        });
+    } );
+
+var reportDeleteRequest = null
+
+function deleteReportFailed()
+{
+    alert("The report deletion was unsuccessful.");
+    
+    document.getElementById('graph-loading').style.display = 'none'
+    document.getElementById('reports-table').style.opacity = ''
+    document.getElementById('event-killer').style.display = 'none'
+    
+    reportDeleteRequest = null
+}
+
+function deleteReportFinished(jsonData, status, xhr)
+{
+    document.getElementById('graph-loading').style.display = 'none'
+    document.getElementById('reports-table').style.opacity = ''
+    document.getElementById('event-killer').style.display = 'none'
+    
+    if (!jsonData.success) {
+        alert("The report deletion was unsuccessful. " + jsonData.reason);
+        reportDeleteRequest = null
+        return;
+    }
+        
+    alert("The report was successfully deleted.");
+
+    window.location.reload()
+}
+
+function deleteReport(code)
+{
+    if (reportDeleteRequest)
+        return
+    
+    var answer = confirm("Are you sure you want to delete this report?");
+    if (!answer)
+        return
+
+    document.getElementById('graph-loading').style.display = 'block'
+    document.getElementById('reports-table').style.opacity = '0.4'
+
+    // Put up our event killer.
+    document.getElementById('event-killer').style.display = ''
+
+    reportDeleteRequest = $.getJSON("/reports/delete/" + code, deleteReportFinished).fail(deleteReportFailed);      
+}
+
+</script>
+
+
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1955439907736310"
+  });
+</script>
+
+
+<script> 
+window.onload = function(){ 
+    edgeSpriteFix() 
+setTimeout(function() { 
+var ad = document.querySelector("ins.adsbygoogle");
+if (ad && ad.innerHTML.replace(/\s/g, "").length == 0) {
+    ad.style.cssText = 'display:block !important'; 
+    ad.parentNode.innerHTML += '<div style="padding:5px; background-color:#202020; border:1px solid #555555; margin:5px 5px 10px 5px; display:inline-block; text-align:left">You appear to be blocking our ads with an Ad Blocker. Warcraft Logs depends on these ads to help cover our high server costs. Please add *.warcraftlogs.com to your ad blocker\'s whitelist or consider supporting the site by sponsoring it on <a href="https://www.patreon.com/warcraftlogs">Patreon</a>.</div>';
+}
+}, 1000);
+};
+</script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-141717050-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-141717050-1');
+</script>
+
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#237afc"
+    },
+    "button": {
+      "background": "#fff",
+      "text": "#237afc"
+    }
+  }
+})});
+
+
+</script>
+
+</head>
+
+
+<body class="responsive 
+ warcraft
+">
+
+
+<aside class="sidebar left-bar" id="zr-sidebar"></aside>
+
+
+
+
+<ul id="main-menu" class="sm sm-black">
+    
+<li id="home-menu"><a href="/"><img id="home-logo" src="https://assets.rpglogs.com/img/warcraft/favicon.png">   
+</a></li>
+<li id="zones-and-realms-toggle" class="sidebar-opener" onmouseover="lazyLoadSidebar(this, '#zr-sidebar')" onclick="sidebarTogglerClicked(this, '#zr-sidebar')">
+  <span></span>
+  <span></span>
+  <span></span>
+</li>
+
+<style>
+.game-selector { font-size:12px !important;  margin:5px 6px 0 -5px !important; padding:1px 0 2px!important; }
+.game-selector .zmdi { font-size:16px !important; vertical-align:-2px; padding-right:2px; }
+a.game-selector-item { color:white !important; padding:1px 6px!important; }
+.compact-search .game-selector { display:none }
+.game-selector .smaller { font-size:12px } 
+#twitch-link-icon { width:16px; height:16px; display:block; }
+#stream-count-box, #polls-count-box { display:flex; margin:10px 10px 8px 50px; border:1px solid #555555; align-items:center; background-color:#202020 }
+#stream-count-box > a, #polls-count-box > a { display:flex }
+#stream-count-box span { margin-left:10px }
+#stream-count-box .compact-stream-count { display:none }
+
+#polls-count-box { margin-left:10px; background-color:#002020; border-color:#4040a0; }
+
+#report-info-menu ~ #stream-count-box .compact-stream-count { display:inline; font-size:10px }
+#report-info-menu ~ #stream-count-box .verbose-stream-count { display:none }
+
+@media (max-width:1200px)
+{
+    #stream-count-box span { font-size:10px !important; }
+}
+
+@media (max-width:1100px)
+{
+    #stream-count-box .compact-stream-count { display:inline }
+    #stream-count-box .verbose-stream-count { display:none }
+    
+    #polls-count-box { display:none }
+}
+
+@media (max-width:900px)
+{
+    #stream-count-box { display:none !important }
+}
+
+@media (max-width:600px)
+{
+    .game-selector { display:none !important }
+}
+</style>
+
+
+<li class="game-selector">
+<a class="game-selector-item" href="//www.warcraftlogs.com"><span class="zmdi zmdi-square-o"></span> <span class="smaller">Live</span></a>
+<a class="game-selector-item" href="//classic.warcraftlogs.com"><span class="zmdi zmdi-check-square"></span> <span class="smaller">Classic</span></a>
+</li>
+
+<li id="searchfield-compact-menu"><a href="#" class="sidebar-opener" onclick="sidebarTogglerClicked(this, '#searchfield-mobile-wrapper'); document.getElementById('searchfield-mobile').focus(); document.getElementById('searchfield-mobile').select(); return false"><span class="compact-search-container"><span class="zmdi zmdi-search search-white search-compact"></span></span></a>
+<div id="searchfield-mobile-wrapper" class="sidebar top-bar"><div class="searchfield-mini-wrapper"><form style="margin:0;width:100%" accept-charset="utf-8" method=get action="/search/"><input class="searchfield-mini" id="searchfield-mobile" name="term" placeholder="Enter a player, guild, or realm"> <span onclick="this.parentNode.submit()" class="searchbutton-mini" id="searchbutton-mobile"><span class="zmdi zmdi-search search-white searchbutton-mini-image"></span></span><div id="autocomplete-mobile-results" ></form></div></div></div>
+</li>
+
+<li id="searchfield-menu"><div id="searchfield-mini-wrapper" class="searchfield-mini-wrapper"><form style="margin:0;width:100%" accept-charset="utf-8" method=get action="/search/"><input class="searchfield-mini" id="searchfield-mini" name="term" placeholder="Enter a player, guild, or realm"> <span onclick="this.parentNode.submit()" class="searchbutton-mini" id="searchbutton-mini"><span class="zmdi zmdi-search search-white searchbutton-mini-image"></span></span><div id="autocomplete-mini-results" ></form></div></div>
+
+
+
+
+<li id="stream-count-box"><a href="/streams/"><img id="twitch-link-icon" src="https://assets.rpglogs.com/img/social/twitch.png"> <span class="compact-stream-count">7</span><span class="verbose-stream-count">7 Players Streaming</span></a></li>
+
+
+<li class="right" id="lang-switcher-menu"><a href="#"><span class="zmdi zmdi-translate"></span> <span id="lang-switcher-text">Language</span></a>
+     <ul class="levels">
+        <li><a id="lang-switcher-de" href="//de.classic.warcraftlogs.com/">Deutsch</a></li>
+        <li><a id="lang-switcher-en" href="//classic.warcraftlogs.com/">English</a></li>
+        <li><a id="lang-switcher-es" href="//es.classic.warcraftlogs.com/">Español</a></li>
+        <li><a id="lang-switcher-fr" href="//fr.classic.warcraftlogs.com/">Français</a></li>
+        <li><a id="lang-switcher-it" href="//it.classic.warcraftlogs.com/">Italiano</a></li>
+        <li><a id="lang-switcher-br" href="//br.classic.warcraftlogs.com/">Português (Brasil)</a></li>
+        <li><a id="lang-switcher-ru" href="//ru.classic.warcraftlogs.com/">Русский</a></li>
+        <li><a id="lang-switcher-ko" href="//ko.classic.warcraftlogs.com/">한국어</a></li>
+        <li><a id="lang-switcher-tw" href="//tw.classic.warcraftlogs.com/">繁體中文</a></li>
+        <li><a id="lang-switcher-cn" href="//cn.classic.warcraftlogs.com/">简体中文</a></li>
+     </ul>
+</li>
+<script>
+document.getElementById("lang-switcher-text").innerHTML = document.getElementById("lang-switcher-en").innerHTML
+</script>
+
+<li class="right" id="login-menu"><a href="/login/" id="login-mini" class="login-button"><span class="zmdi zmdi-sign-in"></span> Log In</a></li>
+<li class="right" id="login-menu"><a href="/register/" id="login-mini" class="login-button"><span class="zmdi zmdi-account"></span> Sign Up</a></li>
+
+
+</ul>
+
+<div id="content-and-footer">
+
+<div id="top-banner">
+<!-- Tag ID: warcraftlogs_728x90_970x90_970x250_320x50_ATF -->
+<div align="center" id="warcraftlogs_728x90_970x90_970x250_320x50_ATF">
+<script data-cfasync="false" type="text/javascript">
+    freestar.queue.push(function () { googletag.display('warcraftlogs_728x90_970x90_970x250_320x50_ATF'); });
+</script>
+</div>
+
+</div>
+
+<style>
+    .responsive #content, #guild-bar-inset, #guild-commands { max-width:1800px !important; width:90vw !important; }
+</style>
+
+
+<div id="guild-bar">
+<div id="guild-bar-inset">
+
+
+<img id="guild-portrait-image" class="" src="https://assets.rpglogs.com/img/warcraft/faction-0.png">
+
+<div class="guild-block" id="guild-title">
+    
+
+<a href="/guild/id/491598" class="guild-name white faction-0">零界</a>
+<a id="guildserver" 
+    href="/server/id/5158/"><br>CN - 无畏</a>
+<a id="guildurl" href="http://"><br>http://</a>
+
+</div>
+
+<div id="guild-description">
+Old soldiers never die,they just fade away...
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<div id="guild-commands">
+<div id="guild-commands-inset">
+<a class="guild-tab" href="/guild/calendar/491598/" id="calendar-command" title="Calendar"><span class="zmdi zmdi-calendar"></span><span class="guild-tab-text">Calendar</span></a>
+<a class="guild-tab" href="/guild/reports-list/491598/" id="reportslist-command" title="Reports"><span class="zmdi zmdi-view-list"></span><span class="guild-tab-text">Reports</span></a>
+<a class="guild-tab" href="/guild/characters/491598/" id="characters-command" title="Characters"><span class="zmdi zmdi-accounts"></span><span class="guild-tab-text">Characters</span></a>
+
+
+<a class="guild-tab" href="/guild/attendance/491598" id="attendance-command" title="Attendance"><span class="zmdi zmdi-accounts-list"></span><span class="guild-tab-text">Attendance</a>
+
+<a class="guild-tab" id="rankings-command" href="/guild/rankings/491598/latest/" id="roster-command" title="Rankings"><span class="zmdi zmdi-sort"></span><span class="guild-tab-text">Rankings</span></a>
+
+
+
+
+
+
+</div>
+</div>
+<div style="clear:both"></div>
+
+
+<div id="content" class="not-subscribed ">
+    
+
+<div class="dialog-block">
+<script type="text/javascript" charset="utf-8">
+$(function() {
+    $('#filter-menubar').smartmenus({
+        showOnClick: true,
+        mainMenuSubOffsetX: -1,
+        mainMenuSubOffsetY: -1,
+        subMenusSubOffsetX: 10,
+        subMenusSubOffsetY: 0,
+        subMenusMaxWidth: "800px",
+    });
+    $('#filter-menubar').on('beforefirstshow.smapi', function(e, menu) {  $(menu).find('.lazyload').lazyload() });
+});
+
+var difficulty = 0;
+var obj = null
+var difficulties = new Array();
+
+var gameID = 0;
+var isChallengeMode = false;
+var hasKeystoneLevels = false;
+var zone = 0;
+var boss = 0;
+var filterSpec = "Any";
+var filterClass = "Any";
+var keystone = 0;
+var kills = 0;
+var duration = 0;
+var serverID = 0;
+
+function pluralClassDisplay(className)
+{
+    if (className == "Global")
+        return "";
+    return document.getElementById('class-' + className).getAttribute("plural")
+}
+
+function specDisplay(specName, className)
+{
+    if (className == "Global")
+        return document.getElementById('class-' + className + "-spec-" + specName).getAttribute("plural")
+    return document.getElementById('class-' + className + "-spec-" + specName).innerText
+}
+
+function updateDuration()
+{
+    var value = parseInt(document.getElementById('filter-duration-text').value)
+    window.location.href = "?zone=" + zone + "&boss=" + boss + "&difficulty=" + difficulty + "&class=" + filterClass + "&spec=" + filterSpec + "&kills=" + kills + "&duration=" + value + "&server=" + serverID
+    return false
+}
+
+function setDifficulty(newDifficulty, link)
+{
+    if (!link)
+        return false
+        
+    link.href = "?zone=" + zone + "&boss=" + boss + "&difficulty=" + newDifficulty + "&class=" + filterClass + "&spec=" + filterSpec + "&kills=" + kills + "&duration=" + duration + "&server=" + serverID
+    return true
+}
+
+function setClassAndSpec(className, specName, combatantInfo, link)
+{
+    if (!link)
+        return false
+        
+    link.href = "?zone=" + zone + "&boss=" + boss + "&difficulty=" + difficulty + "&class=" + className + "&spec=" + specName + "&kills=" + kills + "&keystone" + keystone + "&duration=" + duration + "&server=" + serverID
+    return true
+}
+
+</script>
+
+
+<style> 
+.menu-boss-icon, .menu-actor-icon, .menu-faction-icon { width:20px; height:20px; --size:20; border:1px solid #555555; margin-right:8px; vertical-align:-6px; }
+</style>
+
+<ul id="filter-menubar" class="sm sm-black filter-bar-menu" style="margin:5px">
+<li id="filter-zone-selection-container"><a class="filter-item" href="#"><span id="filter-zone-text">All Zones</span></a>
+<ul>
+<li><a id="zone-any" class="Boss" href="?">All Zones</a></li>
+<li class="separator"></li>
+
+
+<li><a id="zone-1006" class="Boss" href="?zone=1006&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Naxxramas</a></li>
+<li><a id="zone-1005" class="Boss" href="?zone=1005&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Temple of Ahn&#039;Qiraj</a></li>
+<li><a id="zone-1004" class="Boss" href="?zone=1004&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Ruins of Ahn&#039;Qiraj</a></li>
+<li><a id="zone-1003" class="Boss" href="?zone=1003&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Zul&#039;Gurub</a></li>
+<li><a id="zone-1002" class="Boss" href="?zone=1002&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Blackwing Lair</a></li>
+<li><a id="zone-1001" class="Boss" href="?zone=1001&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Onyxia</a></li>
+<li><a id="zone-1000" class="Boss" href="?zone=1000&boss=0&difficulty=0&class=Any&spec=Any&keystone=0&kills=0&duration=0">Molten Core</a></li>
+
+
+
+</ul>
+
+</li>
+
+
+
+<li id="filter-team-selection-container" style="float:right"><a class="filter-item" href="#">All Raids</a>
+<ul>
+<li><a class="filter-item" href="/guild/reports-list/491598">All Raids</a>
+<li class="separator"></li>
+
+
+</ul>
+
+
+</ul>
+
+<div class="dialog-content" id="graph-wrapper" style="clear:right">
+<div id="event-killer" style="display:none"></div>
+<div id="graph-loading" style='display:none;'><p>Deleting Report...</p><p><span class="zmdi zmdi-spinner zmdi-hc-spin" style="color:white; font-size:36px"></span></p></div>
+<table cellspacing=0 cellpadding=0 id="reports-table">
+<thead>
+<th class="all">Description
+<th class="all">Owner
+<th>Uploaded
+<th>Duration
+<th>Expires
+<th>Visibility
+<th>Edit
+<th>
+</thead>
+<tbody>
+<tr>
+<td><a href="/reports/DKv2qHm8jtW3gZp7">20201103_1团BWL_龙牙</a>
+<td class="white">apollogame
+<td>
+<script>
+var reportDate = new Date(1604419705 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">4561612$</span><script>document.write(moment.duration(4561612).humanize())
+</script>
+</td>
+<td id="expiresdate-30634030">
+<script>
+var expiresDate = new Date((1604419705 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30634030).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/Z1fxTGM8vh9yn6Fg">5团TAQ（咸鱼）</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1604417855 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">12741051$</span><script>document.write(moment.duration(12741051).humanize())
+</script>
+</td>
+<td id="expiresdate-30633237">
+<script>
+var expiresDate = new Date((1604417855 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30633237).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/1wC7My3JdxTnkXhA">2团-20201103-taq</a>
+<td class="white">ZZ2
+<td>
+<script>
+var reportDate = new Date(1604416564 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">9513688$</span><script>document.write(moment.duration(9513688).humanize())
+</script>
+</td>
+<td id="expiresdate-30632599">
+<script>
+var expiresDate = new Date((1604416564 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30632599).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/b1MpnNkLQFqYzDCR">3团TAQ20201103</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1604414536 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">6804492$</span><script>document.write(moment.duration(6804492).humanize())
+</script>
+</td>
+<td id="expiresdate-30631282">
+<script>
+var expiresDate = new Date((1604414536 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30631282).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/NFQ4zvWDj9x17LGh">6团</a>
+<td class="white">stanly818
+<td>
+<script>
+var reportDate = new Date(1604412690 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">7072593$</span><script>document.write(moment.duration(7072593).humanize())
+</script>
+</td>
+<td id="expiresdate-30629841">
+<script>
+var expiresDate = new Date((1604412690 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30629841).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/nbVhPaHX18kGwCc3">20201103_1团TAQ_死钉</a>
+<td class="white">apollogame
+<td>
+<script>
+var reportDate = new Date(1604412607 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">7148069$</span><script>document.write(moment.duration(7148069).humanize())
+</script>
+</td>
+<td id="expiresdate-30626230">
+<script>
+var expiresDate = new Date((1604412607 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30626230).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/XkP3TjvxtVdhAwyr">老爹TAQ竞速训练局20201031</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1604150536 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">4022902$</span><script>document.write(moment.duration(4022902).humanize())
+</script>
+</td>
+<td id="expiresdate-30582449">
+<script>
+var expiresDate = new Date((1604150536 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30582449).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/NDpqCaybLmdgzjZf">6团</a>
+<td class="white">stanly818
+<td>
+<script>
+var reportDate = new Date(1603903776 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">15970720$</span><script>document.write(moment.duration(15970720).humanize())
+</script>
+</td>
+<td id="expiresdate-30527902">
+<script>
+var expiresDate = new Date((1603903776 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30527902).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/zrGHk2f7Xp8WdyJv">4团TAQ2020.10.28</a>
+<td class="white">ZZ4
+<td>
+<script>
+var reportDate = new Date(1603899238 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">2513180835$</span><script>document.write(moment.duration(2513180835).humanize())
+</script>
+</td>
+<td id="expiresdate-30526348">
+<script>
+var expiresDate = new Date((1603899238 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30526348).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/QbAkGWPFhV8vYpxy">3团BWL20201028</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603895782 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">4390112$</span><script>document.write(moment.duration(4390112).humanize())
+</script>
+</td>
+<td id="expiresdate-30524225">
+<script>
+var expiresDate = new Date((1603895782 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30524225).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/mCTXJwnNZcRKPzfa">20201027_1团TAQ+BWL</a>
+<td class="white">apollogame
+<td>
+<script>
+var reportDate = new Date(1603814665 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">13720453$</span><script>document.write(moment.duration(13720453).humanize())
+</script>
+</td>
+<td id="expiresdate-30497939">
+<script>
+var expiresDate = new Date((1603814665 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30497939).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/TpLYwZBAJF1RkjM4">5团第一把咸鱼</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603810714 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">10032928$</span><script>document.write(moment.duration(10032928).humanize())
+</script>
+</td>
+<td id="expiresdate-30503786">
+<script>
+var expiresDate = new Date((1603810714 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30503786).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/fXd3TFpn6W1BQPaN">3团TAQ20201027</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603810692 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">7425988$</span><script>document.write(moment.duration(7425988).humanize())
+</script>
+</td>
+<td id="expiresdate-30503781">
+<script>
+var expiresDate = new Date((1603810692 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30503781).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/aNzTgFWC6MHq3J9G">2团-20201027-taq</a>
+<td class="white">ZZ2
+<td>
+<script>
+var reportDate = new Date(1603810629 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">10372363$</span><script>document.write(moment.duration(10372363).humanize())
+</script>
+</td>
+<td id="expiresdate-30503757">
+<script>
+var expiresDate = new Date((1603810629 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30503757).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/rzR2byqNGh7nkZVj">老爹竞速TAQ20201024</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603546326 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">4282188$</span><script>document.write(moment.duration(4282188).humanize())
+</script>
+</td>
+<td id="expiresdate-30452274">
+<script>
+var expiresDate = new Date((1603546326 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30452274).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/3f8j6PZJVCM4Nxgc">2团-20201022-bwl</a>
+<td class="white">ZZ2
+<td>
+<script>
+var reportDate = new Date(1603296319 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">7979626$</span><script>document.write(moment.duration(7979626).humanize())
+</script>
+</td>
+<td id="expiresdate-30396609">
+<script>
+var expiresDate = new Date((1603296319 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30396609).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/GHbvVFMNPBnrf9R8">2团-20201022-taq2</a>
+<td class="white">ZZ2
+<td>
+<script>
+var reportDate = new Date(1603296286 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">5543010$</span><script>document.write(moment.duration(5543010).humanize())
+</script>
+</td>
+<td id="expiresdate-30396595">
+<script>
+var expiresDate = new Date((1603296286 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30396595).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/QPR46Gnfg3wjV2bq">2团BWL（缺1号）</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603290217 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">4934030$</span><script>document.write(moment.duration(4934030).humanize())
+</script>
+</td>
+<td id="expiresdate-30393436">
+<script>
+var expiresDate = new Date((1603290217 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30393436).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/kypQvcwCxGVXrW8q">20201020_1团BWL_龙牙多彩</a>
+<td class="white">apollogame
+<td>
+<script>
+var reportDate = new Date(1603212892 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">6774605$</span><script>document.write(moment.duration(6774605).humanize())
+</script>
+</td>
+<td id="expiresdate-30376076">
+<script>
+var expiresDate = new Date((1603212892 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30376076).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/zyqxr9Q7KckfVThY">Temple of Ahn&#039;Qiraj</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603207986 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">13925014$</span><script>document.write(moment.duration(13925014).humanize())
+</script>
+</td>
+<td id="expiresdate-30374060">
+<script>
+var expiresDate = new Date((1603207986 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30374060).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/nCcXJaZkdQWMLz1q">2团-20201020-taq1</a>
+<td class="white">ZZ2
+<td>
+<script>
+var reportDate = new Date(1603207763 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">16914876$</span><script>document.write(moment.duration(16914876).humanize())
+</script>
+</td>
+<td id="expiresdate-30373928">
+<script>
+var expiresDate = new Date((1603207763 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30373928).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/CYMhTZqxm3ya7p4b">20201020_1团TAQ_咸鱼小怪锤</a>
+<td class="white">apollogame
+<td>
+<script>
+var reportDate = new Date(1603205148 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">8373288$</span><script>document.write(moment.duration(8373288).humanize())
+</script>
+</td>
+<td id="expiresdate-30372065">
+<script>
+var expiresDate = new Date((1603205148 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30372065).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/xAV74PNrFJGTnCc6">三团TAQ20201020</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1603205065 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">6572836$</span><script>document.write(moment.duration(6572836).humanize())
+</script>
+</td>
+<td id="expiresdate-30371994">
+<script>
+var expiresDate = new Date((1603205065 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30371994).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/LTVnfcpKwYHBdqQD">老爹轻竞速第一CD-TAQ20201017-更新版</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1602942707 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">5164858$</span><script>document.write(moment.duration(5164858).humanize())
+</script>
+</td>
+<td id="expiresdate-30319617">
+<script>
+var expiresDate = new Date((1602942707 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30319617).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+<tr>
+<td><a href="/reports/6V1kRbDxGTw9hWv4">老爹轻竞速第一CD-TAQ20201017</a>
+<td class="white">ZZ5
+<td>
+<script>
+var reportDate = new Date(1602941745 * 1000);
+var dateWrapper = moment(reportDate);
+document.write(dateWrapper.format("LLL"))
+</script>
+<td><span style="display:none">23908284$</span><script>document.write(moment.duration(23908284).humanize())
+</script>
+</td>
+<td id="expiresdate-30319250">
+<script>
+var expiresDate = new Date((1602941745 + 15552000) * 1000);
+var dateWrapper = moment(expiresDate);
+document.write(dateWrapper.format("LLL"));
+if (expiresDate.getTime() < new Date().getTime())
+    document.getElementById('expiresdate-' + 30319250).style.color = 'rgb(90%,50%,40%)'
+</script>
+
+<td>
+ Public
+<td style="text-align:center">
+<td style="text-align:center"></tr>
+
+</table>
+
+<div style="margin:1em">
+<nav>
+        <ul class="pagination">
+            
+                            <li class="page-item disabled" aria-disabled="true" aria-label="&laquo; Previous">
+                    <span class="page-link" aria-hidden="true">&lsaquo;</span>
+                </li>
+            
+            
+                            
+                
+                
+                                                                                        <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=2">2</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=3">3</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=4">4</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=5">5</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=6">6</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=7">7</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=8">8</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=9">9</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=10">10</a></li>
+                                                                                        
+                                    <li class="page-item disabled" aria-disabled="true"><span class="page-link">...</span></li>
+                
+                
+                                            
+                
+                
+                                                                                        <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=16">16</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=17">17</a></li>
+                                                                        
+            
+                            <li class="page-item">
+                    <a class="page-link" href="https://classic.warcraftlogs.com/guild/reports-list/491598?page=2" rel="next" aria-label="Next &raquo;">&rsaquo;</a>
+                </li>
+                    </ul>
+    </nav>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+$("#reportslist-command").addClass('selected')
+</script>
+
+</div>
+
+
+<div id="footer-spacer" class="unsubscribed"></div>
+
+<div id="footer">
+
+
+<div id="bottom-banner">
+
+<!-- Tag ID: warcraftlogs_728x90_970x90_970x250_320x50_BTF -->
+<div align="center" id="warcraftlogs_728x90_970x90_970x250_320x50_BTF">
+<script data-cfasync="false" type="text/javascript">
+    freestar.queue.push(function () { googletag.display('warcraftlogs_728x90_970x90_970x250_320x50_BTF'); });
+</script>
+</div>
+
+
+</div>
+
+
+<p>
+</p>
+
+&copy; 2013-2020 Warcraft Logs - <a href="/help/contact/">Contact Us</a> - <a href="http://forums.combatlogforums.com">Forums</a>
+- <a href="https://classic.warcraftlogs.com/home/discord">Chat</a>
+- <a href="https://classic.warcraftlogs.com/help/start">Help</a>
+- <a href="https://classic.warcraftlogs.com/help/privacy">Privacy Policy</a>
+- <a href="https://www.patreon.com/warcraftlogs">Donate</a>
+    - <a href="https://twitter.com/WarcraftLogs" class="zmdi zmdi-twitter" style="font-size:16px; vertical-align:-2px;">
+</a>
+</div>
+</div>
+
+<script>
+    $(function() {
+        $("#searchfield-mini").autocomplete({
+          source: "https://classic.warcraftlogs.com/search/autocomplete", minLength:2, autoFocus:true, appendTo: "#autocomplete-mini-results", select: function( event, ui ) { window.location.href = ui.item.link; }
+        }).autocomplete("instance")._renderItem = function( ul, item ) {
+            var item = $('<div class="master-autocomplete-item"><div class="label ' + item.labelClass + '">' + item.label + '</div><div class="server">' + item.server + '</div><div class="type">' + item.type + '</div></div>');
+            return $("<li>").append(item).appendTo(ul);
+        };
+        
+        $("#searchfield-mobile").autocomplete({
+      source: "https://classic.warcraftlogs.com/search/autocomplete", minLength:2, autoFocus:true, appendTo: "#autocomplete-mobile-results", select: function( event, ui ) { window.location.href = ui.item.link; }
+        }).autocomplete("instance")._renderItem = function( ul, item ) {
+            var item = $('<div class="master-autocomplete-item"><div class="label ' + item.labelClass + '">' + item.label + '</div><div class="server">' + item.server + '</div><div class="type">' + item.type + '</div></div>');
+            return $("<li>").append(item).appendTo(ul);
+        };
+       });
+       
+</script>
+
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam-cell.nr-data.net","licenseKey":"05fe91986a","applicationID":"752138690","transactionName":"b10GZEcCWEtTUxJfW1YXJVNBCllWHVcTX1hcFhZVRQxETEEdCl9HTA==","queueTime":0,"applicationTime":28,"atts":"QxoFEg8YS0U=","errorBeacon":"bam-cell.nr-data.net","agent":""}</script></body>
+</html>

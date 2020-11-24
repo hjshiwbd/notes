@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+<script type="text/javascript" async=true>
+(function() {
+  var host = 'warcraftlogs.com';
+  var element = document.createElement('script');
+  var firstScript = document.getElementsByTagName('script')[0];
+  var url = 'https://quantcast.mgr.consensu.org'
+    .concat('/choice/', 'KvP_65z5XueLh', '/', host, '/choice.js')
+  var uspTries = 0;
+  var uspTriesLimit = 3;
+  element.async = true;
+  element.type = 'text/javascript';
+  element.src = url;
+
+  firstScript.parentNode.insertBefore(element, firstScript);
+
+  function makeStub() {
+    var TCF_LOCATOR_NAME = '__tcfapiLocator';
+    var queue = [];
+    var win = window;
+    var cmpFrame;
+
+    function addFrame() {
+      var doc = win.document;
+      var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+
+      if (!otherCMP) {
+        if (doc.body) {
+          var iframe = doc.createElement('iframe');
+
+          iframe.style.cssText = 'display:none';
+          iframe.name = TCF_LOCATOR_NAME;
+          doc.body.appendChild(iframe);
+        } else {
+          setTimeout(addFrame, 5);
+        }
+      }
+      return !otherCMP;
+    }
+
+    function tcfAPIHandler() {
+      var gdprApplies;
+      var args = arguments;
+
+      if (!args.length) {
+        return queue;
+      } else if (args[0] === 'setGdprApplies') {
+        if (
+          args.length > 3 &&
+          args[2] === 2 &&
+          typeof args[3] === 'boolean'
+        ) {
+          gdprApplies = args[3];
+          if (typeof args[2] === 'function') {
+            args[2]('set', true);
+          }
+        }
+      } else if (args[0] === 'ping') {
+        var retr = {
+          gdprApplies: gdprApplies,
+          cmpLoaded: false,
+          cmpStatus: 'stub'
+        };
+
+        if (typeof args[2] === 'function') {
+          args[2](retr);
+        }
+      } else {
+        queue.push(args);
+      }
+    }
+
+    function postMessageEventHandler(event) {
+      var msgIsString = typeof event.data === 'string';
+      var json = {};
+
+      try {
+        if (msgIsString) {
+          json = JSON.parse(event.data);
+        } else {
+          json = event.data;
+        }
+      } catch (ignore) {}
+
+      var payload = json.__tcfapiCall;
+
+      if (payload) {
+        window.__tcfapi(
+          payload.command,
+          payload.version,
+          function(retValue, success) {
+            var returnMsg = {
+              __tcfapiReturn: {
+                returnValue: retValue,
+                success: success,
+                callId: payload.callId
+              }
+            };
+            if (msgIsString) {
+              returnMsg = JSON.stringify(returnMsg);
+            }
+            event.source.postMessage(returnMsg, '*');
+          },
+          payload.parameter
+        );
+      }
+    }
+
+    while (win) {
+      try {
+        if (win.frames[TCF_LOCATOR_NAME]) {
+          cmpFrame = win;
+          break;
+        }
+      } catch (ignore) {}
+
+      if (win === window.top) {
+        break;
+      }
+      win = win.parent;
+    }
+    if (!cmpFrame) {
+      addFrame();
+      win.__tcfapi = tcfAPIHandler;
+      win.addEventListener('message', postMessageEventHandler, false);
+    }
+  };
+
+  makeStub();
+
+  var uspStubFunction = function() {
+    var arg = arguments;
+    if (typeof window.__uspapi !== uspStubFunction) {
+      setTimeout(function() {
+        if (typeof window.__uspapi !== 'undefined') {
+          window.__uspapi.apply(window.__uspapi, arg);
+        }
+      }, 500);
+    }
+  };
+
+  var checkIfUspIsReady = function() {
+    uspTries++;
+    if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+      console.warn('USP is not accessible');
+    } else {
+      clearInterval(uspInterval);
+    }
+  };
+
+  if (typeof window.__uspapi === 'undefined') {
+    window.__uspapi = uspStubFunction;
+    var uspInterval = setInterval(checkIfUspIsReady, 6000);
+  }
+})();
+</script>
+<!-- End Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={licenseKey:"05fe91986a",applicationID:"752138690"};window.NREUM||(NREUM={}),__nr_require=function(e,t,n){function r(n){if(!t[n]){var i=t[n]={exports:{}};e[n][0].call(i.exports,function(t){var i=e[n][1][t];return r(i||t)},i,i.exports)}return t[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<n.length;i++)r(n[i]);return r}({1:[function(e,t,n){function r(){}function i(e,t,n){return function(){return o(e,[u.now()].concat(c(arguments)),t?null:this,n),t?void 0:this}}var o=e("handle"),a=e(6),c=e(7),f=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var d=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],p="api-",l=p+"ixn-";a(d,function(e,t){s[t]=i(p+t,!0,"api")}),s.addPageAction=i(p+"addPageAction",!0),s.setCurrentRouteName=i(p+"routeName",!0),t.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,t){var n={},r=this,i="function"==typeof t;return o(l+"tracer",[u.now(),e,n],r),function(){if(f.emit((i?"":"no-")+"fn-start",[u.now(),r,i],n),i)try{return t.apply(this,arguments)}catch(e){throw f.emit("fn-err",[arguments,this,e],n),e}finally{f.emit("fn-end",[u.now()],n)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,t){m[t]=i(l+t)}),newrelic.noticeError=function(e,t){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,t])}},{}],2:[function(e,t,n){function r(){return c.exists&&performance.now?Math.round(performance.now()):(o=Math.max((new Date).getTime(),o))-a}function i(){return o}var o=(new Date).getTime(),a=o,c=e(8);t.exports=r,t.exports.offset=a,t.exports.getLastTimestamp=i},{}],3:[function(e,t,n){function r(e,t){var n=e.getEntries();n.forEach(function(e){"first-paint"===e.name?d("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&d("timing",["fcp",Math.floor(e.startTime)])})}function i(e,t){var n=e.getEntries();n.length>0&&d("lcp",[n[n.length-1]])}function o(e){e.getEntries().forEach(function(e){e.hadRecentInput||d("cls",[e])})}function a(e){if(e instanceof m&&!g){var t=Math.round(e.timeStamp),n={type:e.type};t<=p.now()?n.fid=p.now()-t:t>p.offset&&t<=Date.now()?(t-=p.offset,n.fid=p.now()-t):t=p.now(),g=!0,d("timing",["fi",t,n])}}function c(e){d("pageHide",[p.now(),e])}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var f,u,s,d=e("handle"),p=e("loader"),l=e(5),m=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){f=new PerformanceObserver(r);try{f.observe({entryTypes:["paint"]})}catch(v){}u=new PerformanceObserver(i);try{u.observe({entryTypes:["largest-contentful-paint"]})}catch(v){}s=new PerformanceObserver(o);try{s.observe({type:"layout-shift",buffered:!0})}catch(v){}}if("addEventListener"in document){var g=!1,y=["click","keydown","mousedown","pointerdown","touchstart"];y.forEach(function(e){document.addEventListener(e,a,!1)})}l(c)}},{}],4:[function(e,t,n){function r(e,t){if(!i)return!1;if(e!==i)return!1;if(!t)return!0;if(!o)return!1;for(var n=o.split("."),r=t.split("."),a=0;a<r.length;a++)if(r[a]!==n[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var c=navigator.userAgent,f=c.match(a);f&&c.indexOf("Chrome")===-1&&c.indexOf("Chromium")===-1&&(i="Safari",o=f[1])}t.exports={agent:i,version:o,match:r}},{}],5:[function(e,t,n){function r(e){function t(){e(a&&document[a]?document[a]:document[i]?"hidden":"visible")}"addEventListener"in document&&o&&document.addEventListener(o,t,!1)}t.exports=r;var i,o,a;"undefined"!=typeof document.hidden?(i="hidden",o="visibilitychange",a="visibilityState"):"undefined"!=typeof document.msHidden?(i="msHidden",o="msvisibilitychange"):"undefined"!=typeof document.webkitHidden&&(i="webkitHidden",o="webkitvisibilitychange",a="webkitVisibilityState")},{}],6:[function(e,t,n){function r(e,t){var n=[],r="",o=0;for(r in e)i.call(e,r)&&(n[o]=t(r,e[r]),o+=1);return n}var i=Object.prototype.hasOwnProperty;t.exports=r},{}],7:[function(e,t,n){function r(e,t,n){t||(t=0),"undefined"==typeof n&&(n=e?e.length:0);for(var r=-1,i=n-t||0,o=Array(i<0?0:i);++r<i;)o[r]=e[t+r];return o}t.exports=r},{}],8:[function(e,t,n){t.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,t,n){function r(){}function i(e){function t(e){return e&&e instanceof r?e:e?f(e,c,o):o()}function n(n,r,i,o){if(!p.aborted||o){e&&e(n,r,i);for(var a=t(i),c=v(n),f=c.length,u=0;u<f;u++)c[u].apply(a,r);var d=s[w[n]];return d&&d.push([b,n,r,a]),a}}function l(e,t){h[e]=v(e).concat(t)}function m(e,t){var n=h[e];if(n)for(var r=0;r<n.length;r++)n[r]===t&&n.splice(r,1)}function v(e){return h[e]||[]}function g(e){return d[e]=d[e]||i(n)}function y(e,t){u(e,function(e,n){t=t||"feature",w[n]=t,t in s||(s[t]=[])})}var h={},w={},b={on:l,addEventListener:l,removeEventListener:m,emit:n,get:g,listeners:v,context:t,buffer:y,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(p.aborted=!0,s=p.backlog={})}var c="nr@context",f=e("gos"),u=e(6),s={},d={},p=t.exports=i();p.backlog=s},{}],gos:[function(e,t,n){function r(e,t,n){if(i.call(e,t))return e[t];var r=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,t,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[t]=r,r}var i=Object.prototype.hasOwnProperty;t.exports=r},{}],handle:[function(e,t,n){function r(e,t,n,r){i.buffer([e],r),i.emit(e,t,n)}var i=e("ee").get("handle");t.exports=r,r.ee=i},{}],id:[function(e,t,n){function r(e){var t=typeof e;return!e||"object"!==t&&"function"!==t?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");t.exports=r},{}],loader:[function(e,t,n){function r(){if(!E++){var e=b.info=NREUM.info,t=p.getElementsByTagName("script")[0];if(setTimeout(u.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&t))return u.abort();f(h,function(t,n){e[t]||(e[t]=n)});var n=a();c("mark",["onload",n+b.offset],null,"api"),c("timing",["load",n]);var r=p.createElement("script");r.src="https://"+e.agent,t.parentNode.insertBefore(r,t)}}function i(){"complete"===p.readyState&&o()}function o(){c("mark",["domContent",a()+b.offset],null,"api")}var a=e(2),c=e("handle"),f=e(6),u=e("ee"),s=e(4),d=window,p=d.document,l="addEventListener",m="attachEvent",v=d.XMLHttpRequest,g=v&&v.prototype;NREUM.o={ST:setTimeout,SI:d.setImmediate,CT:clearTimeout,XHR:v,REQ:d.Request,EV:d.Event,PR:d.Promise,MO:d.MutationObserver};var y=""+location,h={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1184.min.js"},w=v&&g&&g[l]&&!/CriOS/.test(navigator.userAgent),b=t.exports={offset:a.getLastTimestamp(),now:a,origin:y,features:{},xhrWrappable:w,userAgent:s};e(1),e(3),p[l]?(p[l]("DOMContentLoaded",o,!1),d[l]("load",r,!1)):(p[m]("onreadystatechange",i),d[m]("onload",r)),c("mark",["firstbyte",a.getLastTimestamp()],null,"api");var E=0},{}],"wrap-function":[function(e,t,n){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(7),a="nr@original",c=Object.prototype.hasOwnProperty,f=!1;t.exports=function(e,t){function n(e,t,n,i){function nrWrapper(){var r,a,c,f;try{a=this,r=o(arguments),c="function"==typeof n?n(r,a):n||{}}catch(u){p([u,"",[r,a,i],c])}s(t+"start",[r,a,i],c);try{return f=e.apply(a,r)}catch(d){throw s(t+"err",[r,a,d],c),d}finally{s(t+"end",[r,a,f],c)}}return r(e)?e:(t||(t=""),nrWrapper[a]=e,d(e,nrWrapper),nrWrapper)}function u(e,t,i,o){i||(i="");var a,c,f,u="-"===i.charAt(0);for(f=0;f<t.length;f++)c=t[f],a=e[c],r(a)||(e[c]=n(a,u?c+i:i,o,c))}function s(n,r,i){if(!f||t){var o=f;f=!0;try{e.emit(n,r,i,t)}catch(a){p([a,n,r,i])}f=o}}function d(e,t){if(Object.defineProperty&&Object.keys)try{var n=Object.keys(e);return n.forEach(function(n){Object.defineProperty(t,n,{get:function(){return e[n]},set:function(t){return e[n]=t,t}})}),t}catch(r){p([r])}for(var i in e)c.call(e,i)&&(t[i]=e[i]);return t}function p(t){try{e.emit("internal-error",t)}catch(n){}}return e||(e=i),n.inPlace=u,n.flag=a,n}},{}]},{},["loader"]);</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 
+
+    <meta name="keywords" content="World of Warcraft, WoW, MMO, MMORPG, Games, Raid, Combatlog, DPS, Blizzard, Final Fantasy, WildStar, Elder Scrolls, Video Games, Multiplayer, Online Games, Mods, Trion, Rift">
+        <title>Warcraft Logs - Combat Analysis for Warcraft</title>
+    
+    <link type="text/css" href="https://assets.rpglogs.com/css/global.min.css?v=19" rel="stylesheet" />
+    <link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css" rel="stylesheet" type="text/css" />
+
+    <link rel="icon" type="image/png" href="https://assets.rpglogs.com/img/warcraft/favicon.png" />
+
+    <meta name="robots" content="noindex">
+<link type="text/css" href="https://assets.rpglogs.com/css/report.min.css?v=21" rel="stylesheet"/>
+<style>
+
+
+#filter-death-selection-container { overflow-x: auto !important; overflow-y:hidden!important; }
+
+.wipecall-dropdown { margin-right:10px; font-size:11px; box-sizing:border-box; border:none; background:transparent; }
+.wipecall-dropdown a { font-size:11px !important; }
+
+.report-bar-inset, #summary { max-width: 1500px; }
+
+#graph-box { box-sizing:border-box; flex-direction: column; display:flex; flex:1 }
+
+#graph-wrapper { display:flex; flex-direction:row; flex:1; align-items: stretch; }
+#graphs { flex:1; position: relative; display:flex;flex-direction:column; }
+
+#graph-wrapper.maximized #anyclip-container-box, #graph-wrapper.minimized #anyclip-container-box { display:none !important; }
+
+#graph-maximizer, #graph-minimizer { cursor: pointer; }
+#graph-minimizer { margin: 0 3px; }
+
+#graph { position:relative; }
+
+body:not(.replay) #graph-box {  height:272px !important; flex-direction:row }
+body:not(.replay) #graph-container { height:272px !important;  box-sizing:border-box; flex:1; width:0; }
+body:not(.replay) #replay-options-strip { display:none }
+body:not(.replay) #graph { height:238px !important;  }
+
+body:not(.replay) #graph-wrapper.maximized #graph-box {  height:334px !important; }
+body:not(.replay) #graph-wrapper.maximized #graph-container { height:334px !important; }
+body:not(.replay) #graph-wrapper.maximized #graph { height:300px !important;  }
+
+body:not(.replay) #graph-wrapper.minimized #graph-box { height:auto !important; }
+body:not(.replay) #graph-wrapper.minimized #graph-container { height:auto !important; }
+body:not(.replay) #graph-wrapper.minimized #graph { display:none !important;  }
+body:not(.replay) #graph-wrapper.minimized #graph-container .filter-bar { border-bottom:none; }
+
+
+body.overview #anyclip-container-box { display:none !important; }
+
+.combatant-info-event-icon { width:20px; height:20px; border:1px solid #555555; margin:2px 2px 4px 2px; vertical-align:middle; }
+
+#summary { display:flex; flex-direction: row }
+#summary-content { flex:1; width:0 }
+
+#right-ad-box { min-width:160px; max-width:160px; margin: 10px 10px 10px 10px; overflow:hidden; position:sticky; top:70px; align-self: flex-start }
+
+#anyclip-container-box { margin-left:10px; border:1px solid #555555; height:272px; box-sizing:border-box; }
+
+
+#graph-title-strip { font-size:13px; height:20px; padding:5px;position:relative; display:flex; flex-direction:row; justify-content:space-between; align-items:center }
+
+body.replay #right-ad-box, body.replay #anyclip-container-box, body.replay #graph-title-strip { display:none !important }
+
+.anyclip-video { min-width:0 !important; width:400px; margin:0!important; max-width:400px; display:flex; flex-direction:column-reverse; font-size:11px;
+                  }
+#ac-branding-left-text, #ac-branding-right-text { font-size:11px !important; margin-top:0 }
+
+@media (max-width:1250px) {
+    #right-ad-box { display:none }
+}
+
+@media (max-width:1000px) {
+    #anyclip-container-box { display:none!important }
+}
+
+@media (max-width:500px) {
+    #graph-box { display:none!important;}
+    #summary { padding:0; }
+}
+
+@media (max-width:400px) {
+    #login-menu { display:none }
+}
+
+#qc-cmp2-persistent-link { display:none }
+
+</style>
+
+    <style>
+    /* Tighten up scrollers in reports pages */
+    .mCSB_inside > .mCSB_container { margin-right:20px !important }
+    .mCSB_inside > .mCSB_container.mCS_no_scrollbar_y.mCS_y_hidden { margin-right:0 !important }
+    .search-white { color: white; font-size:22px; }
+    .searchbutton-mini-image { padding-left:7px; padding-top:3px; }
+    .compact-search-container { height:36px; display:flex; align-items:center; }
+    .search-compact { font-size:28px; margin-top:-3px; }
+    .zmdi-hc-spin { animation: zmdi-spin 2.5s infinite linear; }
+    .edge-hide { opacity: 0.01; }
+    
+    #qc-cmp2-persistent-link { left:0; right:auto; font-size:10px; background-color:#300040 }
+    .logo-container { width:auto !important; }
+    </style>
+
+<script data-cfasync="false" type="text/javascript">
+  var freestar = freestar || {};
+  freestar.hitTime = Date.now();
+  freestar.queue = freestar.queue || [];
+  freestar.config = freestar.config || {};
+  freestar.debug = window.location.search.indexOf('fsdebug') === -1 ? false : true;
+
+  // Tag IDs set here, must match Tags served in the Body for proper setup
+  freestar.config.enabled_slots = [
+    "warcraftlogs_728x90_970x90_970x250_320x50_ATF",
+   "warcraftlogs_160x600_Right",
+    "warcraftlogs_728x90_970x90_970x250_320x50_BTF"
+  ];
+
+  !function(a,b){var c=b.getElementsByTagName("script")[0],d=b.createElement("script"),e="https://a.pub.network/warcraftlogs-com";e+=freestar.debug?"/qa/pubfig.min.js":"/pubfig.min.js",d.async=!0,d.src=e,c.parentNode.insertBefore(d,c)}(window,document);
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-beta.2/lazyload.min.js"></script>
+
+    <script>
+    jQuery.browser = {};
+(function () {
+    jQuery.browser.msie = false;
+    jQuery.browser.version = 0;
+    if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+        jQuery.browser.msie = true;
+        jQuery.browser.version = RegExp.$1;
+    }
+})();
+    
+    function edgeRevert() { $(".edge-hide").css('transform', ''); $(".edge-hide").removeClass('edge-hide'); }
+    function edgeZoom() { $(".edge-hide").css('transform', 'scale(2)'); setTimeout(edgeRevert, 50); }
+    function edgeSpriteFix(container) { 
+        if (navigator.userAgent.indexOf("Edge") == -1)
+            return
+        var selector = (container ? container + ' ' : '') + ".sprite"
+        $(selector).addClass('edge-hide')
+        setTimeout(edgeZoom, 10)
+    }
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/2.2.2/moment-duration-format.min.js"></script>
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/malihu-custom-scrollbar-plugin-with-iframe-fix@3.1.6/jquery.mCustomScrollbar.min.js"></script>
+
+    <script src="https://assets.rpglogs.com/js/global.min.js?v=2"></script>
+
+    <script>
+    moment.locale("en");
+    </script>
+
+    <script defer type="text/javascript" src="//wow.zamimg.com/widgets/power.js"></script><script>var wowhead_tooltips = { "iconizelinks": false }</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ba-bbq/1.2.1/jquery.ba-bbq.min.js"></script> 
+<script src="https://cdn.datatables.net/v/ju/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/r-2.2.2/datatables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highstock/1.3.7/highstock.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"></script>
+    
+<script>
+var game_id = 0;
+var currentLang = "en";
+var rankingsLabel = "Rankings";
+var report_id = '1wC7My3JdxTnkXhA';
+var zone_id = '1005';
+var expired_state = 0;
+var subscribed = false;
+var report_name = "零界";
+var comparison_reports_string = '';
+var comparisonReports = new Array()
+var comparisonCounts = new Array()
+comparisonCounts[report_name] = 1
+var comparisonName
+
+var guild_id_for_url = "/guild/calendar/491598";
+var start_time = 1604406381834;
+var end_time = 1604415895522;
+var graph_options = parseInt(33)
+var defaultFilterGraph = graph_options & 32
+var pin_options = parseInt(0)
+var wipe_options = parseInt(0)
+
+var assetServer = "https://assets.rpglogs.com"
+
+var icon_path = "https://assets.rpglogs.com/img/warcraft/";
+
+var abilityPath = '//classic.wowhead.com/spell=';
+var buffPath = '//classic.wowhead.com/spell=';
+var itemPath = '//classic.wowhead.com/item=';
+var abilityCutoff = 10;
+var buffCutoff = 0;
+function abilityExternalLink(id)
+{
+    if (id < abilityCutoff)
+        return '#';
+    if (buffCutoff && id >= buffCutoff)
+        return buffPath + (id - buffCutoff);
+    return abilityPath + id;
+}
+
+function itemExternalLink(id)
+{
+    return itemPath + id;
+}
+
+var localizedAffixes = { affix_1: { name: "Overflowing", "icon": "inv_misc_volatilewater.jpg" }, affix_2: { name: "Skittish", "icon": "spell_magic_lesserinvisibilty.jpg" }, affix_3: { name: "Volcanic", "icon": "spell_shaman_lavasurge.jpg" }, affix_4: { name: "Necrotic", "icon": "spell_deathknight_necroticplague.jpg" }, affix_5: { name: "Teeming", "icon": "spell_nature_massteleport.jpg" }, affix_6: { name: "Raging", "icon": "ability_warrior_focusedrage.jpg" }, affix_7: { name: "Bolstering", "icon": "ability_warrior_battleshout.jpg" }, affix_8: { name: "Sanguine", "icon": "spell_shadow_bloodboil.jpg" }, affix_9: { name: "Tyrannical", "icon": "achievement_boss_archaedas.jpg" }, affix_10: { name: "Fortified", "icon": "ability_toughness.jpg" }, affix_11: { name: "Bursting", "icon": "ability_ironmaidens_whirlofblood.jpg" }, affix_12: { name: "Grievous", "icon": "ability_backstab.jpg" }, affix_13: { name: "Explosive", "icon": "spell_fire_felflamering_red.jpg" }, affix_14: { name: "Quaking", "icon": "spell_nature_earthquake.jpg" }, affix_15: { name: "Relentless", "icon": "inv_chest_plate04.jpg" }, affix_16: { name: "Infested", "icon": "achievement_nazmir_boss_ghuun.jpg" }, affix_117: { name: "Reaping", "icon": "ability_racial_embraceoftheloa_bwonsomdi.jpg" }, affix_119: { name: "Beguiling", "icon": "spell_shadow_mindshear.jpg" }, affix_120: { name: "Awakened", "icon": "trade_archaeology_nerubian_obelisk.jpg" }, affix_121: { name: "Prideful", "icon": "spell_animarevendreth_buff.jpg" }, }; function nameForAffix(affix) { return localizedAffixes["affix_" + affix] ? localizedAffixes["affix_" + affix].name : "Unknown"; }; function iconForAffix(affix) { return localizedAffixes["affix_" + affix] ? localizedAffixes["affix_" + affix].icon :  "inv_axe_02.jpg" }; 
+
+var extensionForActorIcons = ".jpg";
+
+</script>
+
+<script type="text/javascript" src="https://assets.rpglogs.com/js/report.min.js?v=95"></script>
+
+<style>
+</style>
+
+
+
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1955439907736310"
+  });
+</script>
+
+
+<script> 
+window.onload = function(){ 
+    edgeSpriteFix() 
+setTimeout(function() { 
+var ad = document.querySelector("ins.adsbygoogle");
+if (ad && ad.innerHTML.replace(/\s/g, "").length == 0) {
+    ad.style.cssText = 'display:block !important'; 
+    ad.parentNode.innerHTML += '<div style="padding:5px; background-color:#202020; border:1px solid #555555; margin:5px 5px 10px 5px; display:inline-block; text-align:left">You appear to be blocking our ads with an Ad Blocker. Warcraft Logs depends on these ads to help cover our high server costs. Please add *.warcraftlogs.com to your ad blocker\'s whitelist or consider supporting the site by sponsoring it on <a href="https://www.patreon.com/warcraftlogs">Patreon</a>.</div>';
+}
+}, 1000);
+};
+</script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-141717050-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-141717050-1');
+</script>
+
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#237afc"
+    },
+    "button": {
+      "background": "#fff",
+      "text": "#237afc"
+    }
+  }
+})});
+
+
+</script>
+
+</head>
+
+
+<body class="responsive 
+compact-search
+ warcraft
+">
+
+
+<aside class="sidebar left-bar" id="zr-sidebar"></aside>
+
+
+<aside class="sidebar right-bar" id="guild-reports-sidebar">
+</aside>
+
+
+<ul id="main-menu" class="sm sm-black">
+    
+<li id="home-menu"><a href="/"><img id="home-logo" src="https://assets.rpglogs.com/img/warcraft/favicon.png">   
+</a></li>
+<li id="zones-and-realms-toggle" class="sidebar-opener" onmouseover="lazyLoadSidebar(this, '#zr-sidebar')" onclick="sidebarTogglerClicked(this, '#zr-sidebar')">
+  <span></span>
+  <span></span>
+  <span></span>
+</li>
+
+<style>
+.game-selector { font-size:12px !important;  margin:5px 6px 0 -5px !important; padding:1px 0 2px!important; }
+.game-selector .zmdi { font-size:16px !important; vertical-align:-2px; padding-right:2px; }
+a.game-selector-item { color:white !important; padding:1px 6px!important; }
+.compact-search .game-selector { display:none }
+.game-selector .smaller { font-size:12px } 
+#twitch-link-icon { width:16px; height:16px; display:block; }
+#stream-count-box, #polls-count-box { display:flex; margin:10px 10px 8px 50px; border:1px solid #555555; align-items:center; background-color:#202020 }
+#stream-count-box > a, #polls-count-box > a { display:flex }
+#stream-count-box span { margin-left:10px }
+#stream-count-box .compact-stream-count { display:none }
+
+#polls-count-box { margin-left:10px; background-color:#002020; border-color:#4040a0; }
+
+#report-info-menu ~ #stream-count-box .compact-stream-count { display:inline; font-size:10px }
+#report-info-menu ~ #stream-count-box .verbose-stream-count { display:none }
+
+@media (max-width:1200px)
+{
+    #stream-count-box span { font-size:10px !important; }
+}
+
+@media (max-width:1100px)
+{
+    #stream-count-box .compact-stream-count { display:inline }
+    #stream-count-box .verbose-stream-count { display:none }
+    
+    #polls-count-box { display:none }
+}
+
+@media (max-width:900px)
+{
+    #stream-count-box { display:none !important }
+}
+
+@media (max-width:600px)
+{
+    .game-selector { display:none !important }
+}
+</style>
+
+
+<li class="game-selector">
+<a class="game-selector-item" href="//www.warcraftlogs.com"><span class="zmdi zmdi-square-o"></span> <span class="smaller">Live</span></a>
+<a class="game-selector-item" href="//classic.warcraftlogs.com"><span class="zmdi zmdi-check-square"></span> <span class="smaller">Classic</span></a>
+</li>
+
+<li id="searchfield-compact-menu"><a href="#" class="sidebar-opener" onclick="sidebarTogglerClicked(this, '#searchfield-mobile-wrapper'); document.getElementById('searchfield-mobile').focus(); document.getElementById('searchfield-mobile').select(); return false"><span class="compact-search-container"><span class="zmdi zmdi-search search-white search-compact"></span></span></a>
+<div id="searchfield-mobile-wrapper" class="sidebar top-bar"><div class="searchfield-mini-wrapper"><form style="margin:0;width:100%" accept-charset="utf-8" method=get action="/search/"><input class="searchfield-mini" id="searchfield-mobile" name="term" placeholder="Enter a player, guild, or realm"> <span onclick="this.parentNode.submit()" class="searchbutton-mini" id="searchbutton-mobile"><span class="zmdi zmdi-search search-white searchbutton-mini-image"></span></span><div id="autocomplete-mobile-results" ></form></div></div></div>
+</li>
+
+<li id="searchfield-menu"><div id="searchfield-mini-wrapper" class="searchfield-mini-wrapper"><form style="margin:0;width:100%" accept-charset="utf-8" method=get action="/search/"><input class="searchfield-mini" id="searchfield-mini" name="term" placeholder="Enter a player, guild, or realm"> <span onclick="this.parentNode.submit()" class="searchbutton-mini" id="searchbutton-mini"><span class="zmdi zmdi-search search-white searchbutton-mini-image"></span></span><div id="autocomplete-mini-results" ></form></div></div>
+
+
+
+<li id="report-info-menu">
+<a id="report-title-link" href="/reports/1wC7My3JdxTnkXhA">
+<div id="report-title-container" style="margin-top:-6px; max-width:45vw">
+2团-20201103-taq
+
+<span id="report-header-owner-text" style="display:inline-block; line-height:11px; margin-left:25px; vertical-align:-5px"><span style="font-size:10px">Created by <span class="white">ZZ2</span><br><span id="reportdate"></span></span></span>
+<script>
+var reportDate = new Date(1604406381834)
+document.getElementById('reportdate').innerHTML = reportDate.toDateString()
+</script>
+</div>
+</a>
+</li>
+
+
+<div id="report-settings-box">
+
+
+<a title="View in Anonymous Mode" href="/reports/view-anonymous/1wC7My3JdxTnkXhA" class="report-command"><span class="zmdi zmdi-developer-board"></span></a>
+
+
+
+</div>
+
+
+
+
+
+<li id="stream-count-box"><a href="/streams/"><img id="twitch-link-icon" src="https://assets.rpglogs.com/img/social/twitch.png"> <span class="compact-stream-count">6</span><span class="verbose-stream-count">6 Players Streaming</span></a></li>
+
+
+<li class="right" id="lang-switcher-menu"><a href="#"><span class="zmdi zmdi-translate"></span> <span id="lang-switcher-text">Language</span></a>
+     <ul class="levels">
+        <li><a id="lang-switcher-de" href="//de.classic.warcraftlogs.com/">Deutsch</a></li>
+        <li><a id="lang-switcher-en" href="//classic.warcraftlogs.com/">English</a></li>
+        <li><a id="lang-switcher-es" href="//es.classic.warcraftlogs.com/">Español</a></li>
+        <li><a id="lang-switcher-fr" href="//fr.classic.warcraftlogs.com/">Français</a></li>
+        <li><a id="lang-switcher-it" href="//it.classic.warcraftlogs.com/">Italiano</a></li>
+        <li><a id="lang-switcher-br" href="//br.classic.warcraftlogs.com/">Português (Brasil)</a></li>
+        <li><a id="lang-switcher-ru" href="//ru.classic.warcraftlogs.com/">Русский</a></li>
+        <li><a id="lang-switcher-ko" href="//ko.classic.warcraftlogs.com/">한국어</a></li>
+        <li><a id="lang-switcher-tw" href="//tw.classic.warcraftlogs.com/">繁體中文</a></li>
+        <li><a id="lang-switcher-cn" href="//cn.classic.warcraftlogs.com/">简体中文</a></li>
+     </ul>
+</li>
+<script>
+document.getElementById("lang-switcher-text").innerHTML = document.getElementById("lang-switcher-en").innerHTML
+</script>
+
+<li class="right" id="login-menu"><a href="/login/" id="login-mini" class="login-button"><span class="zmdi zmdi-sign-in"></span> Log In</a></li>
+<li class="right" id="login-menu"><a href="/register/" id="login-mini" class="login-button"><span class="zmdi zmdi-account"></span> Sign Up</a></li>
+
+
+
+
+
+<li class="right" id="guild-reports-toggle"><a href="#" id="guild-reports-toggle-link" class="sidebar-opener"  
+
+onmouseover="lazyLoadSidebar(this, '#guild-reports-sidebar', report_id)" onclick="sidebarTogglerClicked(this, '#guild-reports-sidebar', report_id); return false"
+>
+
+
+<img src="https://assets.rpglogs.com/img/warcraft/faction-0.png" class="guild-report-image"><span id="guild-reports-text">
+<span class="white faction-0">零界</span> - <span style="color:white"href="/server/5158/">无畏 (CN)</span>
+</span></a></li>
+
+
+
+</ul>
+
+<div id="content-and-footer">
+
+<div id="top-banner">
+<!-- Tag ID: warcraftlogs_728x90_970x90_970x250_320x50_ATF -->
+<div align="center" id="warcraftlogs_728x90_970x90_970x250_320x50_ATF">
+<script data-cfasync="false" type="text/javascript">
+    freestar.queue.push(function () { googletag.display('warcraftlogs_728x90_970x90_970x250_320x50_ATF'); });
+</script>
+</div>
+
+</div>
+
+
+
+
+
+<div id="content" class="not-subscribed uncapped">
+    
+<div id="translate-bar" style="display:none"><div class="report-bar-inset">This report was logged in another language. <input style='margin-left:30px' type=button class="translator-button" value="Translate" onclick="setTranslate(true)"></div></div>
+<div id="untranslate-bar" style="display:none"><div class="report-bar-inset">This report has been translated from another language. <input style='margin-left:30px' class="translator-button" type=button value="Show Original" onclick="setTranslate(false)"></div></div>
+
+
+<div id="report-top-bar">
+<div class="report-bar-inset">
+<div id="filter-fight-and-phase">
+<div id="filter-fight-boss-wrapper" onclick="toggleFightSelectionUI(); return false" oncontextmenu="toggleFightSelectionUI()">
+<img id="filter-fight-boss-icon" onerror="this.src = defaultBossImage()">
+<div id="filter-fight-boss-contents">
+<div id="filter-fight-boss-text" style="font-size:16px;">Fetching Fights</div>
+<div id="filter-fight-details-text">None</div>
+</div>
+</div>
+
+<div id="replay-map-info" style="float:left;margin-left:45px"><div style="font-size:16px; padding:6px 0;">Map</div>
+<div id="map-details-container" style="float:left; margin-top:-1px"><span class="estimate" id="replay-map-name">None</span></div>
+</div>
+
+<div id="graph-zoom-container" style="float:left;">
+<ul id="filter-phase-dropdown" class="dropdown sm sm-black" style="float:left; font-size:16px;"><li><a href="#" onclick="return dropdownClicked(this, event)"><span id="filter-phase-text" style="font-size:16px;">All Phases</span></a>
+<ul id="filter-phase-container"><li><a href="#">All Phases</a></ul>
+</ul>
+<div id="graph-zoom-details" style="float:left; clear:left;margin-left:12px; margin-top:-1px"><span id="graph-zoom-info" class="estimate"></span> <span id="graph-reset-zoom" style="display:none">[<a href="#" onclick="return resetZoom()">Reset Zoom</a>]</span></div>
+</div>
+</div>
+
+<div class="big-tab-container" id="top-level-view-tabs-container">
+<div class="big-tab-table" id="top-level-view-tabs">
+<a href="#" class="big-tab selected view-type-tab" id="filter-analyze-tab" onclick="return changeFilterView('analytical', this)" oncontextmenu="changeFilterView('analytical', this)"><span class="zmdi zmdi-eye"></span> <span class="big-tab-text"><br>Analyze</span></a>
+<a href="#" class="big-tab view-type-tab" id="compare-ui-toggle-tab" onclick="toggleCompareUI(); return false" oncontextmenu="toggleCompareUI()"><span class="zmdi zmdi-compare"></span> <span class="big-tab-text"><br>Compare</span></a>
+
+<a href="#" class="big-tab view-type-tab" id="filter-execution-tab" onclick="return changeFilterView('execution', this)" oncontextmenu="changeFilterView('execution', this)"><span class="zmdi zmdi-puzzle-piece"></span> <span class="big-tab-text"><br>Mechanics</span></a>
+
+<a href="#" class="big-tab view-type-tab" id="filter-rankings-tab" onclick="return changeFilterView('rankings', this)" oncontextmenu="changeFilterView('rankings', this)"><span class="zmdi zmdi-sort"></span> <span class="big-tab-text"><br>Rankings</span></a>
+
+<a href="#" class="big-tab view-type-tab" id="filter-replay-tab" onclick="return changeFilterView('replay', this)" oncontextmenu="changeFilterView('replay', this)"><span class="zmdi zmdi-local-movies"></span> <span class="big-tab-text"><br>Replay</span></a>
+</div>
+
+</div>
+<div style="clear:both"></div>
+
+</div>
+</div>
+<div style="clear:both"></div>
+
+<div> <!-- Needed to work around a bug in Chrome. -->
+<div id="report-fight-selection-area">
+<div class="report-bar-inset" style="padding-top:10px">
+
+<div id="report-overview-fights-contents">
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="report-view-contents">
+<div id="filter-type-menubar">
+<div class="report-bar-inset">
+<div id="filter-source-and-target-selection" style="display:none">
+
+<div style="float:left; position:relative; margin-right:40px" id="filter-source-and-hostility-selection">
+
+<ul id="filter-source-selection-dropdown" class="dropdown sm sm-black"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="filter-source-text" style="font-size:16px;">All Sources</span></a>
+<ul id="filter-source-selection-container"></ul>
+</ul>
+
+<div id="hostility-link-container" style="float:left"><a class="hostility-link" id="hostility-friendlies" href="#" onclick="return changeHostilityType(0, this)" oncontextmenu="changeHostilityType(0, this)">Friendlies</a> <a id="hostility-enemies" href="#" style="margin-left:5px;" class="hostility-link" onclick="return changeHostilityType(1, this)" oncontextmenu="changeHostilityType(1, this)">Enemies</a></div>
+</div>
+
+<div style="clear:both"></div>
+</div>
+
+<div class="big-tab-container">
+<div class="big-tab-table" id="view-type-tabs">
+<a href="#" class="big-tab view-type-tab" id="filter-analytical-tab" onclick="return changeFilterView('analytical', this)" oncontextmenu="changeFilterView('analytical', this)"><span class="zmdi zmdi-grid"></span><span class="big-tab-text"><br>Tables</span></a>
+<a href="#" class="big-tab view-type-tab" id="filter-timeline-tab" onclick="return changeFilterView('timeline', this)" oncontextmenu="changeFilterView('timeline', this)"><span class="zmdi zmdi-time"></span><span class="big-tab-text"><br>Timelines</span></a>
+<a href="#" class="big-tab view-type-tab" id="filter-events-tab" onclick="return changeFilterView('events', this)" oncontextmenu="changeFilterView('events', this)"><span class="zmdi zmdi-view-list-alt"></span><span class="big-tab-text"><br>Events</span></a>
+<a href="#" class="big-tab view-type-tab" id="pins-ui-toggle-tab" onclick="togglePinUI(); return false" oncontextmenu="togglePinUI()"><span class="zmdi zmdi-pin"></span><span class="big-tab-text"><br>Queries</span></a>
+</div>
+</div>
+
+<div style="clear:both"></div>
+</div>
+</div>
+
+<div id="filter-type-tabs-wrapper">
+<div class="report-bar-inset">
+<div id="filter-type-tabs">
+<a href="#" class="filter-type-tab" id="filter-summary-tab" onclick="return changeFilterType('summary', this)" oncontextmenu="return changeFilterType('summary', this)">Summary</a>
+<a href="#"  class="filter-type-tab drop" id="filter-damage-done-tab" onclick="return changeFilterType('damage-done', this)" oncontextmenu="changeFilterType('damage-done', this)">Damage Done</a>
+<a href="#"  class="filter-type-tab drop" id="filter-damage-taken-tab" onclick="return changeFilterType('damage-taken', this)" oncontextmenu="changeFilterType('damage-taken', this)">Damage Taken</a>
+<a href="#"  class="filter-type-tab drop" id="filter-healing-tab" onclick="return changeFilterType('healing', this)" oncontextmenu="changeFilterType('healing', this)">Healing</a>
+<a href="#"  class="filter-type-tab drop" id="filter-threat-tab" onclick="return changeFilterType('threat', this)" oncontextmenu="changeFilterType('threat', this)">Threat</a>
+<a href="#"  class="filter-type-tab drop" id="filter-buffs-tab"  onclick="return changeAuraType('buffs', this)" oncontextmenu="changeAuraType('buffs', this)">Buffs</a>
+<a href="#"  class="filter-type-tab drop" id="filter-debuffs-tab"  onclick="return changeAuraType('debuffs', this)" oncontextmenu="changeAuraType('debuffs', this)">Debuffs</a>
+<a href="#"  class="filter-type-tab" id="filter-deaths-tab"  onclick="return changeFilterType('deaths', this)" oncontextmenu="changeFilterType('deaths', this)">Deaths</a>
+<a href="#"  class="filter-type-tab" id="filter-interrupts-tab"  onclick="return changeFilterType('interrupts', this)" oncontextmenu="changeFilterType('interrupts', this)">Interrupts</a>
+<a href="#"  class="filter-type-tab" id="filter-dispels-tab"  onclick="return changeFilterType('dispels', this)" oncontextmenu="changeFilterType('dispels', this)">Dispels</a>
+<a href="#"  class="filter-type-tab" id="filter-resources-tab"  onclick="return changeFilterType('resources', this)" oncontextmenu="changeFilterType('resources', this)">Resources</a>
+<a href="#"  class="filter-type-tab drop" id="filter-casts-tab"  onclick="return changeFilterType('casts', this)" oncontextmenu="changeFilterType('casts', this)">Casts</a>
+
+<div style="clear:both"></div>
+</div>
+
+</div>
+</div>
+
+<div id="summary">
+<div class="dialog-content" id="summary-content">
+
+<div id="filter-subtype-strip" style="display:none">
+
+<div style="float:left; position:relative; display:none" id="filter-target-and-ability-selection" onmouseover="loadAbilitiesMenuIfNeeded()">
+
+<ul id="filter-death-selection-dropdown" style="display:none" class="dropdown sm sm-black extra-filter-type-dropdown"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="filter-death-selection-text">All Deaths</span></a>
+<ul id="filter-death-selection-container"></ul>
+</ul>
+
+<ul style="float:left;" id="filter-target-selection-dropdown" class="dropdown sm sm-black extra-filter-type-dropdown"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="filter-target-text" >All Targets</span></a>
+<ul id="filter-target-selection-container"></ul>
+</ul>
+<ul style="float:left" id="filter-ability-selection-dropdown" class="dropdown sm sm-black extra-filter-type-dropdown"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="filter-ability-text">All Abilities</span></a>
+<ul id="filter-ability-selection-container"></ul>
+</ul>
+</div> 
+
+<ul id="filter-resource-selection-dropdown" style="display:none" class="dropdown sm sm-black extra-filter-type-dropdown"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="filter-resource-selection-text">Hit Points</span></a>
+<ul id="filter-resource-selection-container"></ul>
+</ul>
+
+
+<ul id="filter-subtype-tabs" style="display:none; float:right" class="dropdown sm sm-black extra-filter-type-dropdown"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="filter-subtype-selection-text"></span></a>
+<ul id="filter-subtype-selection-container">
+<li><a href="#" id="by_source" class="filter-subtype-option" onclick="return changeSubFilterType('source', this)"  oncontextmenu="changeSubFilterType('source', this)"></a>
+<li><a href="#" id="by_target" class="filter-subtype-option" onclick="return changeSubFilterType('target', this)" oncontextmenu="changeSubFilterType('target', this)"></a>
+<li><a href="#" id="by_ability" class="filter-subtype-option" onclick="return changeSubFilterType('ability', this)" oncontextmenu="changeSubFilterType('ability', this)"></a>
+
+</ul>
+</ul>
+
+<div id="filter-subtype-options">
+<a href="#" id="filter-summons-tab" class="filter-options-tab" style="display:none" onclick="return toggleSummonsFilter()" oncontextmenu="toggleSummonsFilter()">Summons</a>
+<a href="#" id="filter-option-64" class="filter-options-tab" onclick="return toggleFilterOption(64, this)" oncontextmenu="toggleFilterOption(64, this)">Melee</a>
+<a href="#" id="filter-option-512" class="filter-options-tab" onclick="return toggleFilterOption(512, this)" oncontextmenu="toggleFilterOption(512, this)">Weighted Damage</a>
+<a href="#" id="filter-option-256" class="filter-options-tab" onclick="return toggleFilterOption(256, this)" oncontextmenu="toggleFilterOption(256, this)">Include Overkill</a>
+<a href="#" id="filter-option-1024" class="filter-options-tab" onclick="return toggleFilterOption(1024, this)" oncontextmenu="toggleFilterOption(1024, this)">NPCs</a>
+<a href="#" id="filter-option-4096" class="filter-options-tab" onclick="return toggleFilterOption(4096, this)" oncontextmenu="toggleFilterOption(4096, this)">Raw Damage</a>
+<a href="#" id="filter-option-128" class="filter-options-tab" onclick="return toggleFilterOption(128, this)" oncontextmenu="toggleFilterOption(128, this)">EHRPS</a>
+<a href="#" id="filter-option-32" class="filter-options-tab" onclick="return toggleFilterOption(32, this)" oncontextmenu="toggleFilterOption(32, this)">Self Absorbs</a>
+<a href="#" id="filter-option-4" class="filter-options-tab" onclick="return toggleFilterOption(4, this)" oncontextmenu="toggleFilterOption(4, this)">External Absorbs</a>
+<a href="#" id="filter-option-2" class="filter-options-tab" onclick="return toggleFilterOption(2, this)" oncontextmenu="toggleFilterOption(2, this)">Pets</a>
+<a href="#" id="filter-option-8" class="filter-options-tab" onclick="return toggleFilterOption(8, this)" oncontextmenu="toggleFilterOption(8, this)">Raw Healing</a>
+<a href="#" id="filter-option-2048" class="filter-options-tab" onclick="return toggleFilterOption(2048, this)" oncontextmenu="toggleFilterOption(2048, this)">Absorbed Healing</a>
+<a href="#" id="filter-option-1" class="filter-options-tab" onclick="return toggleFilterOption(1, this)" oncontextmenu="toggleFilterOption(1, this)">Friendly Fire</a>
+<a href="#" id="filter-option-16" class="filter-options-tab" onclick="return toggleFilterOption(16, this)" oncontextmenu="toggleFilterOption(16, this)">Self-Applied</a>
+</div>
+
+<div style="clear:both"></div>
+</div>
+
+<div id="event-killer" style="display:none"></div>
+<div id="graph-loading" style='display:none;'><p>Loading Data...</p><p><span class="zmdi zmdi-spinner zmdi-hc-spin" style="color:white; font-size:36px"></span></p></div>
+
+<div id="pins-ui" style="display:none;clear:left">
+<div id="pins-ui-tabs">
+<div id="pins-ui-tab-query" class="pins-ui-tab selected" onclick="selectPinsUITab('query')">New Query</div>
+<div id="pins-ui-tab-expression" class="pins-ui-tab" style="margin-left:-1px" onclick="selectPinsUITab('expression')">New Expression</div>
+<div id="pins-ui-tab-paste" class="pins-ui-tab" style="margin-left:-1px" onclick="selectPinsUITab('paste')">From Paste</div>
+
+<span class="zmdi zmdi-close" id="pins-ui-close" onclick="hidePinUI()"></span>
+<div id="pins-ui-help"><a href="/help/pins">Help! I don&#039;t understand how query and expression pins work!</a></div>
+
+</div>
+<div class="pins-ui-content" id="pins-ui-content-paste" style="display:none">Paste your saved pin string into the text box:
+
+<table style="margin:auto; width:100%;"><tr><td style="padding:1em"><textarea id="pins-ui-paste-box" oninput="updatePinPreview()" style="width:100%; box-sizing:border-box; -moz-box-sizing:border-box; display:block; height:200px" autowrap></textarea></table></div>
+
+<div class="pins-ui-content" id="pins-ui-content-expression" style="display:none">Enter your expression below:
+
+<table style="margin:auto; width:100%;"><tr><td style="padding:1em"><textarea id="pins-ui-expression-box" style="width:100%; box-sizing:border-box; -moz-box-sizing:border-box; display:block; height:200px" autowrap></textarea></table>
+
+<p><span id="expression-loading" style='display:none;'><span class="zmdi zmdi-spinner zmdi-hc-spin" style="color:white; font-size:36px"></span> Validating...</span>
+Warcraft Logs can check the syntax of your expression to make sure that it is valid: <input type=button onclick="validateExpression()" value="Validate Expression"></p>
+</div>
+
+<div class="pins-ui-content" id="pins-ui-content-query">
+<p>Select all the event types that apply. If nothing is checked, any type will be allowed.</p>
+
+<table cellspacing=10 style="margin:auto"><tr>
+<td><input id="damage-pin-type" type=checkbox onclick="updatePinUIType(this, 'damage')"> <label for="damage-pin-type">Damage</label>
+<td><input id="healing-pin-type" type=checkbox onclick="updatePinUIType(this, 'healing')"> <label for="healing-pin-type">Healing</label>
+<td><input id="auras-pin-type" type=checkbox onclick="updatePinUIType(this, 'auras')"> <label for="auras-pin-type">Buffs or Debuffs</label>
+<td><input id="dispels-pin-type" type=checkbox onclick="updatePinUIType(this, 'dispels')"> <label for="dispels-pin-type">Dispels/ Steals</label>
+<td><input id="deaths-pin-type" type=checkbox onclick="updatePinUIType(this, 'deaths')"> <label for="deaths-pin-type">Deaths or Resurrects</label>
+</tr>
+<tr>
+<td><input id="casts-pin-type" type=checkbox onclick="updatePinUIType(this, 'casts')"> <label for="casts-pin-type">Casts</label>
+<td><input id="interrupts-pin-type" type=checkbox onclick="updatePinUIType(this, 'interrupts')"> <label for="interrupts-pin-type">Interrupts</label>
+<td><input id="resources-pin-type" type=checkbox onclick="updatePinUIType(this, 'resources')"> <label for="resources-pin-type">Resources</label>
+<td><input id="summons-pin-type" type=checkbox onclick="updatePinUIType(this, 'summons')"> <label for="summons-pin-type">Summons or Creations</label>
+<td><input id="other-pin-type" type=checkbox onclick="updatePinUIType(this, 'other')"> <label for="other-pin-type">Other</label>
+</table>
+<table id="pins-ui-hostility" style="margin:0 auto; display:none" cellspacing=10><tr><td>Source/Target Hostility:
+<td><select id="pins-ui-hostility-select" onchange="updatePinsUIHostility(this.selectedIndex)"></select>
+</table>
+
+<table id="pins-ui-damage" style="margin:0 auto; display:none" cellspacing=10><tr><td>Damage Options:
+<td><input type=checkbox id="pins-ui-damage-misses" checked onclick="updatePinPreview()"><label for="pins-ui-damage-miss"> Misses</label>
+<td><input type=checkbox id="pins-ui-damage-hits" checked onclick="updatePinPreview()"><label for="pins-ui-damage-hits"> Direct</label>
+<td><input type=checkbox id="pins-ui-damage-ticks" checked onclick="updatePinPreview()"><label for="pins-ui-damage-ticks"> Periodic</label>
+</tr>
+
+<tr><td>
+<td><input type=checkbox id="pins-ui-damage-physical" checked onclick="updatePinPreview()"><label for="pins-ui-damage-physical"> Physical</label>
+<td><input type=checkbox id="pins-ui-damage-magical" checked onclick="updatePinPreview()"><label for="pins-ui-damage-magical"> Magical</label>
+
+<tr><td><td colspan=3><label for="pins-ui-damage-crits"> Crit: </label> <select id="pins-ui-damage-crits"><option value="0">Any<option value="1">Require<option value="2">Disallow</select>
+<label for="pins-ui-damage-blocked"> Blocks
+: </label> <select id="pins-ui-damage-blocked"><option value="0">Any<option value="1">Require<option value="2">Disallow</select>
+
+<label for="pins-ui-damage-multistrike"> Multistrike: </label> <select id="pins-ui-damage-multistrike"><option value="0">Any<option value="1">Require<option value="2">Disallow</select>
+</tr>
+</table>
+
+<table id="pins-ui-healing" style="margin:0 auto; display:none" cellspacing=10><tr><td>Healing Options:
+<td><input type=checkbox id="pins-ui-healing-hits" checked onclick="updatePinPreview()"><label for="pins-ui-healing-hits"> Direct</label>
+<td><input type=checkbox id="pins-ui-healing-ticks" checked onclick="updatePinPreview()"><label for="pins-ui-healing-ticks"> Periodic</label>
+<td><input type=checkbox id="pins-ui-healing-absorbs" checked onclick="updatePinPreview()"><label for="pins-ui-healing-absorbs"> Absorbs</label>
+</tr>
+<tr><td><td colspan=3><label for="pins-ui-healing-crits"> Crit: </label> <select id="pins-ui-healing-crits"><option value="0">Any<option value="1">Require<option value="2">Disallow</select>
+<label for="pins-ui-healing-multistrike"> Multistrike: </label> <select id="pins-ui-healing-multistrike"><option value="0">Any<option value="1">Require<option value="2">Disallow</select>
+</tr>
+</table>
+
+<table id="pins-ui-auras" style="margin:0 auto; display:none" cellspacing=10><tr><td>Aura Options:
+<td><input type=checkbox id="pins-ui-aura-buffs" checked onclick="updatePinPreview()"><label for="pins-ui-aura-buffs"> Buffs</label>
+<td><input type=checkbox id="pins-ui-aura-debuffs" checked onclick="updatePinPreview()"><label for="pins-ui-aura-debuffs"> Debuffs</label>
+<td><input type=checkbox id="pins-ui-aura-apply" checked onclick="updatePinPreview()"><label for="pins-ui-aura-apply"> Apply</label>
+<td><input type=checkbox id="pins-ui-aura-refresh" checked onclick="updatePinPreview()"><label for="pins-ui-aura-refresh"> Refresh</label>
+<td><input type=checkbox id="pins-ui-aura-remove" checked onclick="updatePinPreview()"><label for="pins-ui-aura-remove"> Remove</label>
+<td><input type=checkbox id="pins-ui-aura-apply-stack" checked onclick="updatePinPreview()"><label for="pins-ui-aura-apply-stack"> Apply Stack</label>
+<td><input type=checkbox id="pins-ui-aura-remove-stack" checked onclick="updatePinPreview()"><label for="pins-ui-aura-remove-stack"> Remove Stack</label>
+<tr><td><td colspan=5><input type=checkbox id="pins-ui-aura-check" onclick="updatePinPreview()"> Only Match if Aura is <select id="pins-ui-aura-presence" onchange="updatePinPreview()"><option>Present<option>Absent</select> on <select id="pins-ui-aura-actors" onchange="updatePinPreview()"><option>Source<option selected>Target</select>
+</table>
+
+<table id="pins-ui-resources" style="margin:0 auto; display:none" cellspacing=10><tr><td>Resources Options:
+<td><input type=checkbox id="pins-ui-resource-gains" checked onclick="updatePinPreview()"><label for="pins-ui-resource-gains"> Resource Gains</label>
+<td><input type=checkbox id="pins-ui-resource-fields" checked onclick="updatePinPreview()"><label for="pins-ui-resource-fields"> Resource Fields</label>
+<tr><td colspan=3 style="text-align:center">Match Resource Type: <select id="pins-ui-resource-type" onchange="updatePinPreview()">
+<option value="0">Any Resource Type</option>
+<option version="1" oldname="" id="resource-option-1000" value="1000">Hit Points</option><option version="1" oldname="" id="resource-option-1001" value="1001">Attack Power</option><option version="1" oldname="" id="resource-option-1002" value="1002">Spell Power</option><option version="11" oldname="" id="resource-option-1003" value="1003">Armor</option><option version="1" oldname="" id="resource-option-1004" value="1004">Absorb</option><option version="1" oldname="" id="resource-option-100" value="100">Mana</option><option version="1" oldname="" id="resource-option-101" value="101">Rage</option><option version="1" oldname="" id="resource-option-102" value="102">Focus</option><option version="1" oldname="" id="resource-option-103" value="103">Energy</option><option version="1" oldname="" id="resource-option-104" value="104">Combo Points</option><option version="1" oldname="" id="resource-option-105" value="105">Runes</option><option version="1" oldname="" id="resource-option-106" value="106">Runic Power</option><option version="1" oldname="" id="resource-option-107" value="107">Soul Shards</option><option version="7" oldname="" id="resource-option-108" value="108">Astral Power</option><option version="1" oldname="" id="resource-option-109" value="109">Holy Power</option><option version="1" oldname="" id="resource-option-111" value="111">Maelstrom</option><option version="1" oldname="" id="resource-option-112" value="112">Chi</option><option version="7" oldname="" id="resource-option-113" value="113">Insanity</option><option version="1" oldname="" id="resource-option-114" value="114">Burning Embers</option><option version="1" oldname="" id="resource-option-115" value="115">Demonic Fury</option><option version="7" oldname="" id="resource-option-116" value="116">Arcane Charges</option><option version="7" oldname="" id="resource-option-117" value="117">Fury</option><option version="7" oldname="" id="resource-option-118" value="118">Pain</option><option version="1" oldname="" id="resource-option-110" value="110">Alternate Power</option>
+</select>
+</table>
+
+<p>Select specific actors or abilities. By default, all actors and abilities will be allowed. Pets are included implicitly for sources but not for targets.</p>
+
+<table style="margin:auto" cellspacing=10>
+<tr><td style="text-align:right">Actors:<td><span class="pin-type" id="pins-ui-actors-list">All Actors</span> <td style="padding:0"><input id="pins-ui-actors-autocomplete" type=text><div id="pins-ui-actors-autocomplete-results" style="font-size:12px;text-align:left"></div><td style="padding:0"><ul style="margin-left:-15px; margin-top:3px" id="pins-ui-actors-dropdown" class="dropdown sm sm-black"><li style="margin-top:-7px"><a href="#"  onclick="return dropdownClicked(this, event)">&nbsp;</a><ul id="pins-ui-actors-container"></ul></ul>
+
+<tr><td style="text-align:right">Sources:<td><span class="pin-type" id="pins-ui-sources-list">All Sources</span> <td style="padding:0"><input id="pins-ui-sources-autocomplete" type=text><div id="pins-ui-sources-autocomplete-results" style="font-size:12px;text-align:left"></div><td style="padding:0">
+<ul style="margin-left:-15px; margin-top:3px" id="pins-ui-sources-dropdown" class="dropdown sm sm-black"><li style="margin-top:-7px"><a href="#"  onclick="return dropdownClicked(this, event)">&nbsp;</a><ul id="pins-ui-sources-container"></ul></ul>
+
+<td nowrap><input type=checkbox checked id="pins-ui-source-pets"> <label for="pins-ui-source-pets">Include Source Pets</label>
+
+<tr><td style="text-align:right">Targets:<td><span class="pin-type" id="pins-ui-targets-list">All Targets</span> <td style="padding:0"><input id="pins-ui-targets-autocomplete" type=text><div id="pins-ui-targets-autocomplete-results" style="font-size:12px;text-align:left"></div><td style="padding:0">
+<ul style="margin-left:-15px; margin-top:3px" id="pins-ui-targets-dropdown" class="dropdown sm sm-black"><li style="margin-top:-7px"><a href="#"  onclick="return dropdownClicked(this, event)">&nbsp;</a><ul id="pins-ui-targets-container"></ul></ul>
+
+<td nowrap><input type=checkbox checked id="pins-ui-target-pets"> <label for="pins-ui-target-pets">Include Target Pets</label>
+
+<tr><td style="text-align:right">Abilities:<td><span class="pin-type" id="pins-ui-abilities-list">All Abilities</span> <td style="padding:0"><input id="pins-ui-abilities-autocomplete" type=text oninput="loadPinsUIAbilitiesMenuIfNeeded()"><div id="pins-ui-abilities-autocomplete-results" style="font-size:12px;text-align:left"></div><td style="padding:0" onmouseover="loadPinsUIAbilitiesMenuIfNeeded()"><ul style="margin-left:-15px; margin-top:3px" id="pins-ui-abilities-dropdown" class="dropdown sm sm-black"><li style="margin-top:-7px"><a href="#"  onclick="return dropdownClicked(this, event)">&nbsp;</a><ul id="pins-ui-abilities"></ul></ul></div>
+</table>
+
+<table style="margin:auto" cellspacing=10>
+<tr><td>Connect a new query to this one using <input type=button onclick="commitQueryPinUI('or')" value="OR"> <input type=button  onclick="commitQueryPinUI('and')" value="AND">
+</table>
+</div>
+
+<div id="pins-ui-filter-section">
+<table cellspacing=10 style="margin:auto">
+<tr><td>Pin Type: <td><select id="pins-ui-filter-type" onchange="setPinsUITypeExplanation(); updatePinPreview()"><option selected>Decorator<option>Badge<option>Filter<option>Summary
+<option>DPS Weight</option>
+</select>
+<td id="pins-ui-filter-type-explanation" style="width:250px; height:50px"></table>
+
+<table id="pins-ui-summary" style="margin:0 auto; display:none" cellspacing=10><tr>
+<td>Sum <select id="pins-ui-summary-field"><option>By Matches<option>By Amount</select> and sort the results by <select id="pins-ui-summary-entry"><option>Source<option>Target<option>Ability</select>
+</table>
+
+<table id="pins-ui-weight" style="margin:0 auto; display:none" cellspacing=10><tr>
+<td>Weight: <input size=4 id="pins-ui-weight-field" value="1.0">
+</table>
+</div>
+
+<div style="margin-top:1em">Pin Preview:</div>
+<div class="pin" id="pin-ui-preview"></div>
+
+<p style="text-align:right"><input type=button value="Close" onclick="hidePinUI()">  <input type=button onclick="copyPinFromUI()" value="Copy Pin"> <input type=button id="pins-ui-create-or-change-pin" onclick="createOrChangePin()" value="Create Pin"></p>
+
+</div>
+
+<div id="compare-ui" style="display:none;clear:left">
+<p>You can do comparisons manually:
+
+<table cellspacing=10><tr>
+<td><ul id="compare-reports-menu" class="sm sm-black"><li><a href="#" onclick="return false">Compare Reports</a><ul id="compare-reports-menu-contents"></ul></li></ul>
+</table>
+</p>
+
+<p style="border-top:1px solid #555555"></p>
+
+Or you can compare two players in this report:
+<table cellspacing=10><tr>
+<td><ul id="compare-first-selection-dropdown" class="compare-selection-menu sm sm-black"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="compare-first-selection-text">Select First Player</span></a>
+<ul id="compare-first-selection-container"></ul>
+</ul>
+<td><ul id="compare-second-selection-dropdown" class=" compare-selection-menu sm sm-black"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="compare-second-selection-text">Select Second Player</span></a>
+<ul id="compare-second-selection-container"></ul>
+</ul>
+<input id="compare-two-players-button" type=button value="Compare" onclick="comparePlayersInSameReport()">
+</table>
+
+<p style="border-top:1px solid #555555"></p>
+<p>Or you can search for parses similar to yours using the options below:</p>
+<table cellspacing=10><tr><td nowrap>Select Player:
+<td><ul id="compare-selection-dropdown" class="compare-selection-menu sm sm-black"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="compare-selection-text">Select a Player</span></a>
+<ul id="compare-selection-container"></ul>
+</ul>
+<tr><td nowrap>Fight Length: <td>Limit the search to fights whose duration is within <input type=text class="compare-number" value="10" id="compare-duration-delta"> seconds of this fight. This value only applies to kills.
+<tr><td nowrap>Raid Size: <td>Limit the raid size to a difference of no more than <input type=text class="compare-number" value="2" id="compare-size-delta"> players.
+<tr><td nowrap>Item Level: <td>Limit search to parses within <input type=text class="compare-number" value="2" id="compare-ilvl-delta"> item level(s) of the selected player (or the fight's average item level if a fight is selected).
+<tr><td nowrap>Time Range: <td>Limit search to parses that occurred within the last <input type=text class="compare-number" value="28" id="compare-date-delta"> days.
+<tr><td nowrap>Select Metric:
+<td><ul id="compare-metric-dropdown" class="sm sm-black"><li><a href="#"  onclick="return dropdownClicked(this, event)"><span id="compare-metric-text">Default</span></a>
+<ul id="compare-metric-container"><li><a href="#" onclick="return selectComparisonSearchMetric('default', this)" oncontextmenu="selectComparisonSearchMetric('default', this)">Default</a>
+<li><a href="#" onclick="return selectComparisonSearchMetric('dps', this)" oncontextmenu="selectComparisonSearchMetric('dps', this)">Damage</a>
+<li><a href="#" onclick="return selectComparisonSearchMetric('hps', this)" oncontextmenu="selectComparisonSearchMetric('hps', this)">Healing</a>
+<li><a href="#" onclick="return selectComparisonSearchMetric('krsi', this)" oncontextmenu="selectComparisonSearchMetric('krsi', this)">Survivability</a>
+</ul>
+</ul>
+
+</table>
+<p style="text-align:center"><input type=button value="Search" onclick="updateCompareSearchFromTextFields()"></p>
+
+<p id="comparison-search-results">
+
+</p>
+
+</div>
+
+<div id="pins"></div>
+
+<div id="graph-and-table-container">
+
+<div id="graph-wrapper">
+
+<div id="graphs">
+
+<div id="graph-box" style="background-color:#001520">
+<div id="slideshow">
+<table cellpadding=0 cellspacing=0><tr><td id="slideshow-caption">Slideshow Navigation
+<td id="slideshow-body">
+<span id="slideshow-current-event">No slide selected</span><br>
+<span class="slideshow-button" onclick="previousReplaySlide()">&lt;</span><span class="slideshow-button" style="margin-left:-1px; background-color:black!important"><span id="slideshow-current-slide">0</span> / <span id="slideshow-total-slides">0</span>
+</span><span class="slideshow-button" style="margin-left:-1px" onclick="nextReplaySlide()">&gt;</span>
+
+<td id="slideshow-description">Use the arrows to move through all of the events that matched the queries that you specified.
+</table>
+</div>
+
+<div id="position-graph" class="dialog-block ui-widget-content" style="position:relative; height:100%; display:none; text-align:center; margin-bottom:1px; overflow:hidden"><img id="position-graph-backdrop" style="position:absolute;" width="100%"><div id="position-graph-contents"></div><div id="replay-legend"></div></div>
+<div id="graph-container">
+
+
+<div class="filter-bar miniature" id="graph-title-strip">
+    
+<div style="display:flex;flex-direction:row; align-items:center; background-color:transparent;">    
+    <ul id="filter-wipecall-dropdown" class="wipecall-dropdown sm sm-black" ><li><a href="#" style="color:white!important; background-color:inherit!important;" onclick="return dropdownClicked(this, event)"><span id="filter-wipecall-text">Ignore Events After Player Deaths</span></a>
+
+<ul id="filter-graph-dropdown-container">
+    <li><a href="#" id="cutoff-item-0" onclick="return changeWipeCutoff(0)">Ignore Events After Player Deaths</a>
+    <li><a href="#" id="cutoff-item-1" onclick="return changeWipeCutoff(-1)">Ignore Events After A Called Wipe</a>
+</ul>
+</ul>
+
+<form style="display:inline" onsubmit="return changeWipeCutoff(document.getElementById('wipe_cutoff').value)"><input id="wipe_cutoff" type=text maxlength=3 style="width:20px; background-color:rgb(205, 222, 225) !important; " value=""></form>
+
+</div>
+
+<div style="display:flex; flex-direction:row;align-items:center"">
+
+
+<form id="quick-filter-container" onsubmit="createQuickFilterPin(); return false" style="font-size:10px; ">Filter Expression: <input id="quick-filter-pin" type=text style="background-color:rgb(205, 222, 225) !important; width:200px; margin:0;">
+</form>
+
+
+<ul id="filter-graph-dropdown" class="graph-dropdown sm sm-black" id="graph-toggle-tab" style="position:relative""><li><a href="#" style="color:white!important; background-color:inherit!important; padding-top:5px; padding-bottom:5px; padding-right:10px;" onclick="return dropdownClicked(this, event)"><span id="filter-graph-text" class="zmdi zmdi-settings" style="font-size:18px!important"></span>&nbsp;</a>
+
+<ul id="filter-graph-dropdown-container">
+<li><a href="#" class="graph_option" id="toggle-heroism" onclick="togglePlotBands(heroismPlotBands, 'heroism', 1); return false">Heroism</a>
+<li><a href="#" class="graph_option" id="toggle-players" onclick="togglePlotLines(playerDeathPlotLines, 'players', 2); return false">Player Deaths</a>
+<li><a href="#" class="graph_option" id="toggle-combatrez" onclick="togglePlotLines(combatRezPlotLines, 'combatrez', 4); return false">Player Resurrections</a>
+<li><a href="#" class="graph_option" id="toggle-bosses" onclick="togglePlotLines(bossDeathPlotLines, 'bosses', 8); return false">Boss Deaths</a>
+<li><a href="#" class="graph_option" id="toggle-npcs" onclick="togglePlotLines(creatureDeathPlotLines, 'npcs', 16); return false">NPC Deaths</a>
+<li class="separator"></li>
+<li><a href="#" onclick="updateAllGraphItems(chart, true); return false">Show All Entries</a>
+<li><a href="#" onclick="updateAllGraphItems(chart, false); return false">Hide All Entries</a>
+</ul>
+</ul>
+
+<div style="margin-left:5px; margin-right:2px; font-size:18px;"><span id="graph-minimizer" onclick="toggleGraphMinimize()" class="zmdi zmdi-window-minimize"></span> <span id="graph-maximizer" onclick="toggleGraphMaximize()" class="zmdi zmdi-window-maximize"></span></div>
+
+</div>
+</div>
+
+<div id="graph"></div>
+
+</div>
+
+</div>
+
+<div id="replay-options-strip">
+
+<span id="replay-buttons" style="display:none"><span id="play-button" class="graph-legend-button zmdi zmdi-play" style="font-size:24px" onclick="if (disallowPlayClick) playDisallowedAlert(); else toggleReplayState()"></span> <span id="replay-time-counter" style="margin:0 20px"><span id="replay-current-time">00:00</span> / <span id="replay-fight-duration">10:00</span></span>
+
+<span class="replay-filter-controls">Filters: <span style="margin-left:8px" class="replay-legend-button selected" onclick="updateGraphItemsByType(this, positionChart, 'Player')">Players</span><span onclick="updateGraphItemsByType(this, positionChart, 'Pet')" class="replay-legend-button" style="margin-left:-1px">Pets</span><span class="replay-legend-button selected" style="margin-left:-1px" onclick="updateGraphItemsByType(this, positionChart, 'Boss')">Bosses</span><span class="replay-legend-button selected" style="margin-left:-1px;" onclick="updateGraphItemsByType(this, positionChart, 'NPC')">NPCs</span></span>
+
+<span class="replay-speed-controls" style="margin-left:20px">Speed: <span class="replay-legend-button replay-speed" style="margin-left:8px" onclick="setReplaySpeed(0.5, this)">0.5x</span><span class="replay-legend-button replay-speed selected" style="margin-left:-1px" onclick="setReplaySpeed(1, this)">1x</span><span class="replay-legend-button replay-speed" style="margin-left:-1px;" onclick="setReplaySpeed(2, this)">2x</span></span>
+
+<span class="replay-feature-controls" style="margin-left:20px">Features: <span style="margin-left:8px" class="replay-legend-button replay-effects selected" onclick="toggleReplayRaidEffects(this)">Effects</span><span class="replay-legend-button replay-markers selected" style="margin-left:-1px" onclick="toggleReplayRaidMarkers(this)">Markers</span><span class="replay-legend-button replay-icons selected" style="margin-left:-1px" onclick="toggleReplayActorIcons(this)">Icons</span><span class="replay-legend-button replay-meters selected" style="margin-left:-1px" onclick="toggleReplayRaidMeters(this)">Meters</span><span class="replay-legend-button replay-video" style="margin-left:-1px" onclick="toggleReplayRaidVideo(this)">Video</span><span class="replay-legend-button" style="margin-left:-1px" id="replay-queries-toggle" onclick="togglePinUI(); return false" oncontextmenu="togglePinUI()">Queries</span>
+</span>
+
+
+<span class="replay-legend-button zmdi zmdi-fullscreen" id="fullscreen-toggle"  style="font-size:24px" onclick="toggleFullScreen()"></span>
+</span>
+</div>
+
+<div id="unit-frames-container" style="display:none"></div>
+
+</div>
+
+<div id="anyclip-container-box">
+    
+<div id="ac-lre-player-ph" class="anyclip-video" style="margin-bottom:10px"><div id="ac-lre-player"></div></div><script id="lre-player-widget"
+src="https://player.anyclip.com/anyclip-widget/lre-widget/prod/v1/src/lre.js" pubname="warcraftlogscom" widgetname="0011r0000294FlV_492"></script>
+</div>
+
+</div>
+
+<div style="clear:both"></div>
+
+<div id="view-tabs-and-table-container" style="margin-top:10px">
+
+<div id="filter-buffs-container"></div>
+<div id="table-container">
+</div> 
+</div>
+
+</div>
+</div>
+
+<div id="right-ad-box">
+    
+
+<!-- Tag ID: warcraftlogs_160x600_Right -->
+<div align="center" id="warcraftlogs_160x600_Right">
+<script data-cfasync="false" type="text/javascript">
+    freestar.queue.push(function () { googletag.display('warcraftlogs_160x600_Right'); });
+</script>
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+$(window).trigger('hashchange')
+initializeGraphOptions()
+</script>
+
+</div>
+
+
+<div id="footer-spacer" class="unsubscribed"></div>
+
+<div id="footer">
+
+
+<div id="bottom-banner">
+
+<!-- Tag ID: warcraftlogs_728x90_970x90_970x250_320x50_BTF -->
+<div align="center" id="warcraftlogs_728x90_970x90_970x250_320x50_BTF">
+<script data-cfasync="false" type="text/javascript">
+    freestar.queue.push(function () { googletag.display('warcraftlogs_728x90_970x90_970x250_320x50_BTF'); });
+</script>
+</div>
+
+
+</div>
+
+
+<p>
+</p>
+
+&copy; 2013-2020 Warcraft Logs - <a href="/help/contact/">Contact Us</a> - <a href="http://forums.combatlogforums.com">Forums</a>
+- <a href="https://classic.warcraftlogs.com/home/discord">Chat</a>
+- <a href="https://classic.warcraftlogs.com/help/start">Help</a>
+- <a href="https://classic.warcraftlogs.com/help/privacy">Privacy Policy</a>
+- <a href="https://www.patreon.com/warcraftlogs">Donate</a>
+    - <a href="https://twitter.com/WarcraftLogs" class="zmdi zmdi-twitter" style="font-size:16px; vertical-align:-2px;">
+</a>
+</div>
+</div>
+
+<script>
+    $(function() {
+        $("#searchfield-mini").autocomplete({
+          source: "https://classic.warcraftlogs.com/search/autocomplete", minLength:2, autoFocus:true, appendTo: "#autocomplete-mini-results", select: function( event, ui ) { window.location.href = ui.item.link; }
+        }).autocomplete("instance")._renderItem = function( ul, item ) {
+            var item = $('<div class="master-autocomplete-item"><div class="label ' + item.labelClass + '">' + item.label + '</div><div class="server">' + item.server + '</div><div class="type">' + item.type + '</div></div>');
+            return $("<li>").append(item).appendTo(ul);
+        };
+        
+        $("#searchfield-mobile").autocomplete({
+      source: "https://classic.warcraftlogs.com/search/autocomplete", minLength:2, autoFocus:true, appendTo: "#autocomplete-mobile-results", select: function( event, ui ) { window.location.href = ui.item.link; }
+        }).autocomplete("instance")._renderItem = function( ul, item ) {
+            var item = $('<div class="master-autocomplete-item"><div class="label ' + item.labelClass + '">' + item.label + '</div><div class="server">' + item.server + '</div><div class="type">' + item.type + '</div></div>');
+            return $("<li>").append(item).appendTo(ul);
+        };
+       });
+       
+</script>
+
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam-cell.nr-data.net","licenseKey":"05fe91986a","applicationID":"752138690","transactionName":"b10GZEcCWEtTUxJfW1YXJVNBCllWHUIDRltKTBceQwpTTw==","queueTime":0,"applicationTime":13,"atts":"QxoFEg8YS0U=","errorBeacon":"bam-cell.nr-data.net","agent":""}</script></body>
+</html>
