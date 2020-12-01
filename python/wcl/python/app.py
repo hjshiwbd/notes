@@ -75,7 +75,7 @@ def get_report_list(soup):
 
 
 def run_report_list():
-    for i in range(1, 18):
+    for i in range(1, 2):
         html = get_html(report_url + str(i))
         # soup = BeautifulSoup(html, "html.parser")
         # print(html)
@@ -98,7 +98,7 @@ def run2():
 
 def get_db_reportlist():
     # sql = "select * from test.wcl_report where title like '2团%' and id between 254 and 277"
-    sql = "select * from test.wcl_report where title like '2团%' and id <= 277"
+    sql = "select * from test.wcl_report where title like '2团%' order by id desc limit 1"
     with utils.connect_by_code('test001') as conn:
         return utils.query_list(conn, sql)
 
@@ -124,7 +124,7 @@ def run_export():
 
 
 if __name__ == '__main__':
-    # run_report_list()
-    # run_report_detail()
+    run_report_list()
+    run_report_detail()
     run_export()
     # run2()
