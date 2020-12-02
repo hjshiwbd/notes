@@ -15,7 +15,9 @@ CREATE TABLE `t66y_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
 
-import urllib2
+# import urllib2
+import urllib
+import urllib.request
 import traceback
 from bs4 import BeautifulSoup
 import sys
@@ -23,9 +25,9 @@ import zlib
 import time
 from jputils import dbutils
 import logging
+import gzip
+import requests
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
 logging.basicConfig(level=logging.INFO,format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',datefmt='%y-%m-%d %H:%M:%S')
 
 # is_from_local = True
@@ -36,9 +38,47 @@ yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60)
 fid=0
 # 15亚有 25国 2亚无 中文26
 fids = [15,25,2,26]
-crawler_page_length=16
+crawler_page_length=20
 
-def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
+
+
+def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
+    """
+    get请求
+    :return:
+    """
+
+    def get():
+        if with_cookie:
+            session.cookies = http.cookiejar.LWPCookieJar(cookie_file)
+            session.cookies.load(ignore_expires=True, ignore_discard=True)
+
+        proxies=None
+        if proxy:
+            proxies = {
+                'http':'http://127.0.0.1:7890'
+            }
+        return session.get(url, params=data, headers=headers, proxies=proxies, timeout=20)
+
+    if url == "":
+        raise Exception("no url")
+
+    logging.info("{},{}".format(url, data))
+    session = requests.session()
+    r = get()
+
+
+    if r.status_code == 403:
+        raise Exception("login failed")
+    elif r.status_code == 200:
+        return r
+    else:
+        m = "post failed:{}".format(str(r))
+        raise Exception(m)
+
+
+
+def curl_get_old2(url, timeout=5, proxy=False, headers=None, gzip=False):
     if headers is None:
         headers = {}
     try:
@@ -63,7 +103,7 @@ def curl_get(url, timeout=5, proxy=False, headers=None, gzip=False):
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    s = curl_get(url, proxy=True, gzip=True, timeout=20, headers={
+    r = get_url(url, proxy=True, headers={
         "authority": "t66y.com",
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -74,8 +114,11 @@ def from_remote(url):
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-    }).decode('gbk')
-    return s
+    })
+
+    r.encoding='gbk'
+    return r.text
+    # return s
 
 
 def from_local():
@@ -109,10 +152,10 @@ def save_my_db(sqls):
     for sql in sqls:
         # print sql
         try:
-        	dbutils.update(conn, sql)
-    	except Exception as e:
-    		logging.info(sql)
-        	traceback.print_exc()
+            dbutils.update(conn, sql)
+        except Exception as e:
+            logging.info(sql)
+            traceback.print_exc()
         count += 1
     logging.info("%d inserted" % count)
     conn.close()
@@ -171,7 +214,6 @@ def get_create_date(tds):
 
 
 def handle_single_page(url):
-    logging.info(url)
     html = get_page_html(url)
     index_page = BeautifulSoup(html, "html.parser")
     trs = index_page.find_all('tr', class_='tr3 t_one tac')
@@ -213,7 +255,7 @@ def get_queue():
     """
     date = time.strftime("%y%m%d",time.localtime())
     sql = "select * from crawler_queue where date = %(date)s"
-    cc = dbutils.query_list(conn, sql, {"date":date})
+    cc = dbutils.query_list(conn, sql, params={"date":date})
     if len(cc) == 0:
         arr = []
         for id in fids:
