@@ -98,7 +98,8 @@ def run2():
 
 def get_db_reportlist():
     # sql = "select * from test.wcl_report where title like '2团%' and id between 254 and 277"
-    sql = "select * from test.wcl_report where title like '2团%' order by id desc limit 1"
+    sql = "SELECT * FROM test.wcl_report WHERE title LIKE '2团%naxx%'and id not in " \
+          "(select distinct  report_id from test.wcl_report_player) and report_date > '2020-10-01'ORDER BY id DESC"
     with utils.connect_by_code('test001') as conn:
         return utils.query_list(conn, sql)
 
@@ -124,7 +125,7 @@ def run_export():
 
 
 if __name__ == '__main__':
-    run_report_list()
+    # run_report_list()
     run_report_detail()
-    run_export()
+    # run_export()
     # run2()
