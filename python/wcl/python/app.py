@@ -5,6 +5,7 @@ import time
 import logging
 from reportdetail import ReportDetail
 from reportplayer import ReportPlayer
+from reportaward import ReportAward
 
 report_url = 'https://classic.warcraftlogs.com/guild/reports-list/491598?page='
 logging.basicConfig(level=logging.INFO,
@@ -124,8 +125,22 @@ def run_export():
     pass
 
 
+def get_award_list():
+    sql = "select * from test.wcl_report where id = 428"
+    with utils.connect_by_code('test001') as conn:
+        return utils.query_list(conn, sql)
+
+
+def run_award():
+    # award_list = get_award_list()
+    # for report in award_list:
+    report_award = ReportAward(428)
+    report_award.run()
+
+
 if __name__ == '__main__':
     # run_report_list()
-    run_report_detail()
+    # run_report_detail()
     # run_export()
+    run_award()
     # run2()
