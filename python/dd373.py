@@ -83,9 +83,13 @@ def resolve_by_bs4(html):
         })
     l2.sort(key=lambda x: x['rate'])
     # logging.info(l2)
-    rate = get_toggle_price1()
-    gold_amount = float(l2[0]['price'][0:l2[0]['price'].index('金')])
-    msg = "target={}, curr={}".format(str(rate)[0:6], l2[0])
+    #期待折扣 toggle_rate
+    token_rate = utils.get_token_rate() #时光汇率
+    rate = token_rate * toggle_rate #目标汇率
+    real_rate = l2[0]['rate'] / token_rate #实际折扣
+    gold_amount = float(l2[0]['price'][0:l2[0]['price'].index('金')]) #平台汇率
+    msg = "toggle_rate={}, real_rate={}, token_amount={}, target_amount={}, real_amount={}".format(str(toggle_rate), str(real_rate), 
+        str(token_rate), str(rate), str(l2[0]['rate']))
     logging.info(msg)
     if l2[0]['rate'] < rate and gold_amount >= 1000:
         send_mail(msg, msg)
