@@ -38,8 +38,8 @@ yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60)
 fid=0
 # 15亚有 25国 2亚无 中文26
 fids = [15,25,2,26]
-crawler_page_length=20
-
+crawler_page_start=1
+crawler_page_length=30
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -159,6 +159,7 @@ def save_my_db(sqls):
         count += 1
     logging.info("%d inserted" % count)
     conn.close()
+    return count
 
 
 def get_sql(exist_id_list, articles):
@@ -245,7 +246,7 @@ def handle_single_page(url):
 
     exist_id_list = query_exist(articles)
     sqls = get_sql(exist_id_list, articles)
-    save_my_db(sqls)
+    return save_my_db(sqls)
 
 def get_queue():
     """
@@ -256,20 +257,24 @@ def get_queue():
     date = time.strftime("%y%m%d",time.localtime())
     sql = "select * from crawler_queue where date = %(date)s"
     cc = dbutils.query_list(conn, sql, params={"date":date})
-    if len(cc) == 0:
-        arr = []
-        for id in fids:
-            for n in range(1,crawler_page_length+1):
-                arr.append({
-                    "fid":id,
-                    "page":n,
-                    "date":date,
-                })  # 子栏目id, 爬前n页数
-        sql = "INSERT INTO `crawler_queue`(`date`, `fid`, `page`) VALUES ( %(date)s, %(fid)s, %(page)s) "
-        for one in arr:
-            dbutils.update(conn, sql, one)
-        sql = "select * from crawler_queue where date = %(date)s"
-        cc = dbutils.query_list(conn, sql, {"date":date})
+    # if len(cc) == 0:
+    arr = []
+    for id in fids:
+        for n in range(crawler_page_start,crawler_page_length+1):
+            arr.append({
+                "fid":id,
+                "page":n,
+                "date":date,
+            })  # 子栏目id, 爬前n页数
+
+    sql_count = "select count(*) cc from crawler_queue where date = %(date)s and fid = %(fid)s and page =%(page)s"
+    sql_insert = "INSERT INTO `crawler_queue`(`date`, `fid`, `page`) VALUES ( %(date)s, %(fid)s, %(page)s) "
+    for one in arr:
+        v = dbutils.query_one(conn, sql_count, one)
+        if v.cc == 0:
+            dbutils.update(conn, sql_insert, one)
+    sql = "select * from crawler_queue where date = %(date)s and status='new'"
+    cc = dbutils.query_list(conn, sql, {"date":date})
     return [k for k in cc if k.status == 'new']
 
 
@@ -279,13 +284,20 @@ def run():
 
     queue_list = get_queue()
     
+    stopped= {}
+
     for one in queue_list:
         fid = one.fid
         n = one.page
+        key='fid'+str(fid)
         url_base = 'http://t66y.com/thread0806.php?fid='+str(fid)+'&search=&page='
         url = url_base + str(n)
-        handle_single_page(url)
-        time.sleep(3)
+        count = -1
+        if (key not in stopped):
+            count = handle_single_page(url)
+            time.sleep(3)
+        if count == 0:
+            stopped[key] = 1
         sql = "update crawler_queue set status = 'done' where id = "+str(one.id)
         dbutils.update(conn, sql)
     conn.close()
