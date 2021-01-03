@@ -27,6 +27,7 @@ from jputils import dbutils
 import logging
 import gzip
 import requests
+import re
 
 logging.basicConfig(level=logging.INFO,format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',datefmt='%y-%m-%d %H:%M:%S')
 
@@ -39,7 +40,7 @@ fid=0
 # 15亚有 25国 2亚无 中文26
 fids = [15,25,2,26]
 crawler_page_start=1
-crawler_page_length=30
+crawler_page_length=40
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -194,7 +195,9 @@ def get_id_from_href(href):
         return href.split("/")[3][0:-5]
     else:
         key = "tid="
-        return href[href.index(key) + len(key):]
+        start = href.index(key) + len(key)
+        end = start + 7
+        return href[start:end]
 
     # id = get_id_from_href(href.split("/")[3][0:-5]  # "/"到".html"之间的数字,即其原文id)
 
@@ -305,8 +308,11 @@ def run():
 
 
 def run2():
-    a=time.strftime("%y%m%d",time.localtime())
-    print(a)
+    s = 'read.php?tid=4250878&fpage=13'
+    key = "tid="
+    start = s.index(key) + len(key)
+    end = start + 7
+
 
 if __name__ == '__main__':
     run()
