@@ -29,18 +29,20 @@ import gzip
 import requests
 import re
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',datefmt='%y-%m-%d %H:%M:%S')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
+                    datefmt='%y-%m-%d %H:%M:%S')
 
 # is_from_local = True
 is_from_local = False
 
 today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
-fid=0
+fid = 0
 # 15亚有 25国 2亚无 中文26
-fids = [15,25,2,26]
-crawler_page_start=1
-crawler_page_length=40
+fids = [15, 25, 2, 26]
+crawler_page_start = 1
+crawler_page_length = 70
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -54,10 +56,10 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
             session.cookies = http.cookiejar.LWPCookieJar(cookie_file)
             session.cookies.load(ignore_expires=True, ignore_discard=True)
 
-        proxies=None
+        proxies = None
         if proxy:
             proxies = {
-                'http':'http://127.0.0.1:7890'
+                'http': 'http://127.0.0.1:7890'
             }
         return session.get(url, params=data, headers=headers, proxies=proxies, timeout=20)
 
@@ -68,7 +70,6 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
     session = requests.session()
     r = get()
 
-
     if r.status_code == 403:
         raise Exception("login failed")
     elif r.status_code == 200:
@@ -76,29 +77,6 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
     else:
         m = "post failed:{}".format(str(r))
         raise Exception(m)
-
-
-
-def curl_get_old2(url, timeout=5, proxy=False, headers=None, gzip=False):
-    if headers is None:
-        headers = {}
-    try:
-        opener = urllib2.build_opener()
-        if proxy:
-            proxy_info = {'host': '127.0.0.1',
-                          'port': 7890}
-            proxy_support = urllib2.ProxyHandler({"http": "http://%(host)s:%(port)d" % proxy_info})
-            opener = urllib2.build_opener(proxy_support)
-
-        request = urllib2.Request(url, headers=headers)
-
-        resp = opener.open(request, timeout=timeout)
-        resp_html = resp.read()
-        if gzip:
-            resp_html = zlib.decompress(resp_html, 16 + zlib.MAX_WBITS)
-        return resp_html
-    except Exception:
-        traceback.print_exc()
 
 
 def from_remote(url):
@@ -117,15 +95,15 @@ def from_remote(url):
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
     })
 
-    r.encoding='gbk'
+    r.encoding = 'gbk'
     return r.text
     # return s
 
 
 def from_local():
     # io = open('C:\\Users\\Administrator\\Desktop\\page1.html')
-    io = open('C:\\Users\\Administrator\\Desktop\\page5.html')
-    return ''.join([s.decode('utf-8') for s in io.readlines()])
+    io = open('C:\\Users\\Administrator\\Desktop\\assdf.txt', encoding="utf-8")
+    return ''.join([s for s in io.readlines()])
 
 
 def get_page_html(url):
@@ -170,7 +148,8 @@ def get_sql(exist_id_list, articles):
             sql = """
                 INSERT INTO `crawler`.`t66y_article` (`fid`,`original_id`, `title`, `author_name`, `post_date`, `link` )
             VALUES	( '%s','%s','%s','%s','%s','%s');
-                """.strip().replace("\n", "") % (str(fid), o['id'], o['title'], o['author'], o['create_date'], o['href'])
+                """.strip().replace("\n", "") % (
+                str(fid), o['id'], o['title'], o['author'], o['create_date'], o['href'])
             result.append(sql)
     return result
 
@@ -204,6 +183,10 @@ def get_id_from_href(href):
 
 def get_create_date(tds):
     dom_date = tds[2].div
+    if not dom_date.span:
+        return dom_date.get_text() + ' 00:00:00'
+    if dom_date.get_text() == 'Top-marks':
+        return dom_date.span['title'].replace('置顶主题：', '')
     dates = dom_date.get_text().split(' ')
     if len(dates) == 2:
         date1 = ''
@@ -223,7 +206,7 @@ def handle_single_page(url):
     trs = index_page.find_all('tr', class_='tr3 t_one tac')
     articles = []
     for tr in trs:
-        ignores = ['來訪者必看的內容 - 使你更快速上手', '草榴官方客戶端 & 大陸入口', 'BT區注意事項，版規']
+        ignores = ['來訪者必看的內容 - 使你更快速上手', '草榴官方客戶端', '注意事項', '关于用Bitcomet']
         txt = tr.get_text()
         flag = False
         for s in ignores:
@@ -236,12 +219,13 @@ def handle_single_page(url):
         dom_link = tds[1].h3.a
         author = tds[2].a.get_text()
         create_date = get_create_date(tds)
+        # print(create_date)
         href = dom_link['href']
         id = get_id_from_href(href)
         o = {
             "id": id,
             "href": dom_link['href'],
-            "title": dom_link.get_text().replace("'","''"),
+            "title": dom_link.get_text().replace("'", "''"),
             "author": author,
             'create_date': create_date
         }
@@ -251,23 +235,24 @@ def handle_single_page(url):
     sqls = get_sql(exist_id_list, articles)
     return save_my_db(sqls)
 
+
 def get_queue():
     """
     当本日的队列
     不存在,生成带爬取数据,爬取.并写入mysql,类似于队列
     存在,取到队列,爬取
     """
-    date = time.strftime("%y%m%d",time.localtime())
+    date = time.strftime("%y%m%d", time.localtime())
     sql = "select * from crawler_queue where date = %(date)s"
-    cc = dbutils.query_list(conn, sql, params={"date":date})
+    cc = dbutils.query_list(conn, sql, params={"date": date})
     # if len(cc) == 0:
     arr = []
     for id in fids:
-        for n in range(crawler_page_start,crawler_page_length+1):
+        for n in range(crawler_page_start, crawler_page_length + 1):
             arr.append({
-                "fid":id,
-                "page":n,
-                "date":date,
+                "fid": id,
+                "page": n,
+                "date": date,
             })  # 子栏目id, 爬前n页数
 
     sql_count = "select count(*) cc from crawler_queue where date = %(date)s and fid = %(fid)s and page =%(page)s"
@@ -277,26 +262,26 @@ def get_queue():
         if v.cc == 0:
             dbutils.update(conn, sql_insert, one)
     sql = "select * from crawler_queue where date = %(date)s and status='new'"
-    cc = dbutils.query_list(conn, sql, {"date":date})
+    cc = dbutils.query_list(conn, sql, {"date": date})
     return [k for k in cc if k.status == 'new']
 
 
 def run():
-    global fid,conn
+    global fid, conn
     conn = get_conn()
 
     queue_list = get_queue()
-    
-    stopped= {}
+
+    stopped = {}
 
     for one in queue_list:
         fid = one.fid
         n = one.page
-        key='fid'+str(fid)
-        url_base = 'http://t66y.com/thread0806.php?fid='+str(fid)+'&search=&page='
+        key = 'fid' + str(fid)
+        url_base = 'http://t66y.com/thread0806.php?fid=' + str(fid) + '&search=&page='
         url = url_base + str(n)
         count = -1
-        if (key not in stopped):
+        if key not in stopped:
             count = handle_single_page(url)
             time.sleep(3)
         if count == 0:
