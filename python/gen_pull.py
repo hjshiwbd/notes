@@ -2,7 +2,7 @@ import sys
 import os
 
 """
-对root文件夹下所有git仓库执行git pull
+对root文件夹下所有git仓库执行git pull 
 约定:
   默认root下每个文件夹都是一个仓库,执行git pull
   root下以"!"开头的文件夹表示下一个仓库的多个分支,会对每个仓库都git pull
