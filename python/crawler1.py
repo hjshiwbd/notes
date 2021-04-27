@@ -42,7 +42,7 @@ fid = 0
 # 15亚有 25国 2亚无 中文26
 fids = [15, 25, 2, 26]
 crawler_page_start = 1
-crawler_page_length = 70
+crawler_page_length = 20
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -216,7 +216,10 @@ def handle_single_page(url):
             continue
 
         tds = tr.find_all('td')
+        if len(tds) != 6:
+            continue
         dom_link = tds[1].h3.a
+        # print(len(tds[1]))
         author = tds[2].a.get_text()
         create_date = get_create_date(tds)
         # print(create_date)
