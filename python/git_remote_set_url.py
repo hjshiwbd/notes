@@ -1,8 +1,8 @@
 # coding=utf-8
 """
 修改git地址的域名部分
-git -C D:\git\yuzhi\318-portal remote -v
-git -C D:\git\yuzhi\318-portal remote set-url origin http://git.wedemo.cn:82/ems/318-portal.git
+git -C D:\\git\\yuzhi\\318-portal remote -v
+git -C D:\\git\\yuzhi\\318-portal remote set-url origin http://git.wedemo.cn:82/ems/318-portal.git
 """
 
 import logging
@@ -44,7 +44,7 @@ def run():
     # path = "D:\\git\\yuzhi\\apartment-mpw"
     # git_set_url(path)
 
-    root = "D:\\git\\yuzhi"
+    root = "G:\\git\\yuzhi"
     dirlist = os.listdir(root)
 
     ignore = ['!new folder']

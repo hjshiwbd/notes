@@ -15,19 +15,13 @@ CREATE TABLE `t66y_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
 
-# import urllib2
-import urllib
-import urllib.request
-import traceback
-from bs4 import BeautifulSoup
-import sys
-import zlib
-import time
-from jputils import dbutils
 import logging
-import gzip
+import time
+import traceback
+
 import requests
-import re
+from bs4 import BeautifulSoup
+from jputils import dbutils
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
@@ -39,10 +33,10 @@ is_from_local = False
 today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
 fid = 0
-# 15亚有 25国 2亚无 中文26
-fids = [15, 25, 2, 26]
+# 15亚有 25国 2亚无 中文26 欧美4 http21
+fids = [15, 25, 2, 26, 21, 4]
 crawler_page_start = 1
-crawler_page_length = 20
+crawler_page_length = 100
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -66,7 +60,7 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
     if url == "":
         raise Exception("no url")
 
-    logging.info("{},{}".format(url, data))
+    logging.info(f"{url},{data}")
     session = requests.session()
     r = get()
 
@@ -75,7 +69,7 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
     elif r.status_code == 200:
         return r
     else:
-        m = "post failed:{}".format(str(r))
+        m = f"post failed:{str(r)}"
         raise Exception(m)
 
 
@@ -216,7 +210,7 @@ def handle_single_page(url):
             continue
 
         tds = tr.find_all('td')
-        if len(tds) != 6:
+        if len(tds) != 6 and fid not in [4, 21]:
             continue
         dom_link = tds[1].h3.a
         # print(len(tds[1]))
@@ -228,7 +222,7 @@ def handle_single_page(url):
         o = {
             "id": id,
             "href": dom_link['href'],
-            "title": dom_link.get_text().replace("'", "''"),
+            "title": dom_link.get_text().replace("'", "''").replace("\\", "\\\\"),
             "author": author,
             'create_date': create_date
         }
@@ -246,8 +240,8 @@ def get_queue():
     存在,取到队列,爬取
     """
     date = time.strftime("%y%m%d", time.localtime())
-    sql = "select * from crawler_queue where date = %(date)s"
-    cc = dbutils.query_list(conn, sql, params={"date": date})
+    # sql = "select * from crawler_queue where date = %(date)s"
+    # cc = dbutils.query_list(conn, sql, params={"date": date})
     # if len(cc) == 0:
     arr = []
     for id in fids:
@@ -277,6 +271,9 @@ def run():
 
     stopped = {}
 
+    if len(queue_list) == 0:
+        logging.info("queue_list is empty")
+
     for one in queue_list:
         fid = one.fid
         n = one.page
@@ -289,7 +286,7 @@ def run():
             time.sleep(3)
         if count == 0:
             stopped[key] = 1
-        sql = "update crawler_queue set status = 'done' where id = "+str(one.id)
+        sql = "update crawler_queue set status = 'done' where id = " + str(one.id)
         dbutils.update(conn, sql)
     conn.close()
     logging.info("done")
