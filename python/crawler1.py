@@ -27,6 +27,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
                     datefmt='%y-%m-%d %H:%M:%S')
 
+domain="t66y.com"
 # is_from_local = True
 is_from_local = False
 
@@ -34,9 +35,11 @@ today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
 fid = 0
 # 15亚有 25国 2亚无 中文26 欧美4 http21
-fids = [15, 25, 2, 26, 21, 4]
+fids = [4,15,2,21, 25,  26]
+#爬取起始页
 crawler_page_start = 1
-crawler_page_length = 100
+#爬取终止页
+crawler_page_length = 25
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -77,7 +80,7 @@ def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
     r = get_url(url, proxy=True, headers={
-        "authority": "t66y.com",
+        "authority": domain,
         "method": "GET",
         "path": "/thread0806.php?fid=25",
         "Proxy-Connection": "keep-alive",
@@ -278,8 +281,7 @@ def run():
         fid = one.fid
         n = one.page
         key = 'fid' + str(fid)
-        url_base = 'http://t66y.com/thread0806.php?fid=' + str(fid) + '&search=&page='
-        url = url_base + str(n)
+        url = f'http://{domain}/thread0806.php?fid={str(fid)}&search=&page={str(n)}'
         count = -1
         if key not in stopped:
             count = handle_single_page(url)
