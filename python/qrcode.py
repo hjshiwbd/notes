@@ -3,7 +3,7 @@
 import os
 from MyQR import myqr
 words = '''
-http://deccapay.fuioupay.com/native?token=20210820081127466007
+https://qr.alipay.com/bax03807pz9bvst5kxf60001
 '''.strip()
 version, level, qr_name = myqr.run(
     words,
