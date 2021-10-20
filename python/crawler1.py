@@ -27,8 +27,9 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
                     datefmt='%y-%m-%d %H:%M:%S')
 
+#69c.org
 # domain="t66y.com"
-domain="cl.298x.xyz"
+domain="cl.757y.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -41,7 +42,7 @@ fids = [4,15,2,21, 25,  26]
 #爬取起始页
 crawler_page_start = 1
 #爬取终止页
-crawler_page_length = 25
+crawler_page_length = 8
 #获取0则停止当前fid
 break_on_count0 = True
 
@@ -292,7 +293,7 @@ def run():
             time.sleep(3)
         if count == 0 and break_on_count0:
             stopped[key] = 1
-        sql = "update crawler_queue set status = 'done' where id = " + str(one.id)
+        sql = f"update crawler_queue set status = 'done', get_count = {count} where id = {one.id}"
         dbutils.update(conn, sql)
     conn.close()
     logging.info("done")
