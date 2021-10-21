@@ -115,16 +115,20 @@ def handle_one_month(vehicle_type, date):
 
 def run():
     snowflake_init()
-    start = '2015-01'
-    end = '2019-02'
+    start = '2021-09'
+    end = '2021-09'
     d = datetime.datetime.strptime(start, '%Y-%m')
     while True:
-        handle_one_month(vehcle_type['suv'], d)
+        handle_one_month(vehcle_type['car'], d)
+        logging.info("processing")
         time.sleep(3)
         d = d + relativedelta(months=1)
         d2 = d.strftime('%Y-%m')
+
         if d2 > end:
             break
+    logging.info("finish")
+    # 程序不会真的停止,因为cmd开启了一个服务
 
 
 def idserver():
