@@ -27,9 +27,9 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
                     datefmt='%y-%m-%d %H:%M:%S')
 
-#69c.org
+# 69c.org
 # domain="t66y.com"
-domain="cl.757y.xyz"
+domain = "cl.757y.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -38,13 +38,14 @@ today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
 fid = 0
 # 15亚有 25国 2亚无 中文26 欧美4 http21
-fids = [26,25,15,2,21,4]
-#爬取起始页
+# fids = [26,25,15,2,21,4]
+fids = [5]
+# 爬取起始页
 crawler_page_start = 1
-#爬取终止页
-crawler_page_length = 25
-#获取0则停止当前fid
-break_on_count0 = True
+# 爬取终止页
+crawler_page_length = 100
+# 获取0则停止当前fid
+break_on_count0 = False
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -202,23 +203,28 @@ def get_create_date(tds):
     return create_date
 
 
+def is_ignore(tr):
+    ignores = ['來訪者必看的內容 - 使你更快速上手', '草榴官方客戶端', '注意事項', '关于用Bitcomet']
+    txt = tr.get_text()
+    flag = False
+    for s in ignores:
+        if s in txt:
+            flag = True
+    return flag
+
+
 def handle_single_page(url):
     html = get_page_html(url)
     index_page = BeautifulSoup(html, "html.parser")
     trs = index_page.find_all('tr', class_='tr3 t_one tac')
     articles = []
     for tr in trs:
-        ignores = ['來訪者必看的內容 - 使你更快速上手', '草榴官方客戶端', '注意事項', '关于用Bitcomet']
-        txt = tr.get_text()
-        flag = False
-        for s in ignores:
-            if s in txt:
-                flag = True
+        flag = is_ignore(tr)
         if flag:
             continue
 
         tds = tr.find_all('td')
-        if len(tds) != 6 and fid not in [4, 21]:
+        if len(tds) != 6 and fid not in [4, 5, 21]:
             continue
         dom_link = tds[1].h3.a
         # print(len(tds[1]))
