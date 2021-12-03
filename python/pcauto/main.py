@@ -38,12 +38,17 @@ mysql_pass = 'hUaNgj_2020'
 
 vehcle_type = {
     "car": "1",
-    "suv": "2"
+    "suv": "2",
+    "mpn": "3"
 }
+vtype = vehcle_type['suv']
 
 # from_local = True
 from_local = False
 snowflake_port = 8910
+
+start = '2021-10'
+end = '2021-10'
 
 
 def get_html(vehicle_type, data_year, data_month):
@@ -89,7 +94,8 @@ def handle_one_month(vehicle_type, date):
         brand_lv2 = td_arr[1].text
         price_min, price_max = get_price(td_arr[2].text)
         sales_num = td_arr[4].text
-        # logging.info(f'{id}, {rank}, {brand_lv1}, {brand_lv2}, {price_min}, {price_max}, {sales_num}')
+        # logging.info(f'{id}, {rank}, {brand_lv1}, {brand_lv2}, {price_min},
+        # {price_max}, {sales_num}')
         all.append({
             "id": id,
             "data_year": date.year,
@@ -115,11 +121,9 @@ def handle_one_month(vehicle_type, date):
 
 def run():
     snowflake_init()
-    start = '2021-09'
-    end = '2021-09'
     d = datetime.datetime.strptime(start, '%Y-%m')
     while True:
-        handle_one_month(vehcle_type['car'], d)
+        handle_one_month(vtype, d)
         logging.info("processing")
         time.sleep(3)
         d = d + relativedelta(months=1)
@@ -140,6 +144,7 @@ def get_id():
 
 
 class MysqlProp:
+
     def __init__(self, **kwargs):
         self.mysql_host = kwargs['mysql_host']
         self.mysql_port = kwargs['mysql_port']
