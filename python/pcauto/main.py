@@ -39,16 +39,16 @@ mysql_pass = 'hUaNgj_2020'
 vehcle_type = {
     "car": "1",
     "suv": "2",
-    "mpn": "3"
+    "mpv": "3"
 }
-vtype = vehcle_type['suv']
+vtype = vehcle_type['mpv']
 
 # from_local = True
 from_local = False
 snowflake_port = 8910
 
-start = '2021-10'
-end = '2021-10'
+start = '2021-11'
+end = '2021-11'
 
 
 def get_html(vehicle_type, data_year, data_month):
