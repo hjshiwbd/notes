@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO,
 
 # 69c.org
 # domain="t66y.com"
-domain = "cl.757y.xyz"
+domain = "cl.2790x.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -37,9 +37,8 @@ is_from_local = False
 today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
 fid = 0
-# 15亚有 25国 2亚无 中文26 欧美4 http21
-# fids = [26,25,15,2,21,4]
-fids = [5]
+# 15亚有 25国 2亚无 中文26 欧美4 http21 动画5
+fids = [26, 25, 15, 2, 21, 4, 5]
 # 爬取起始页
 crawler_page_start = 1
 # 爬取终止页
@@ -98,7 +97,7 @@ def from_remote(url):
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
     })
 
-    r.encoding = 'gbk'
+    r.encoding = 'utf-8'
     return r.text
     # return s
 
@@ -158,7 +157,10 @@ def get_sql(exist_id_list, articles):
 
 
 def query_exist(articles):
-    ids = "'" + "','".join([o['id'] for o in articles]) + "'"
+    ids = ",".join([f"'{str(o['id'])}'" for o in articles])
+    if ids == '':
+        raise 'article ids is empty'
+
     sql = """
 SELECT * FROM `t66y_article` where original_id in (%s)
     """ % ids
@@ -222,21 +224,22 @@ def handle_single_page(url):
         flag = is_ignore(tr)
         if flag:
             continue
-
+        # 2种情况
+        # 0赞 1标题(id,链接) 2作者&创建时间 3回复数量 4下载 5最后回复
+        # 0赞 1标题(id,链接) 2作者&创建时间 3回复数量 4最后回复
         tds = tr.find_all('td')
-        if len(tds) != 6 and fid not in [4, 5, 21]:
-            continue
         dom_link = tds[1].h3.a
+        href = dom_link['href']
+        id = get_id_from_href(href)
+        title = dom_link.get_text().replace("'", "''").replace("\\", "\\\\")
         # print(len(tds[1]))
         author = tds[2].a.get_text()
         create_date = get_create_date(tds)
         # print(create_date)
-        href = dom_link['href']
-        id = get_id_from_href(href)
         o = {
             "id": id,
-            "href": dom_link['href'],
-            "title": dom_link.get_text().replace("'", "''").replace("\\", "\\\\"),
+            "href": href,
+            "title": title,
             "author": author,
             'create_date': create_date
         }
