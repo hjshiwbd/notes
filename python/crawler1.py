@@ -42,9 +42,9 @@ fids = [26, 25, 15, 2, 21, 4, 5]
 # 爬取起始页
 crawler_page_start = 1
 # 爬取终止页
-crawler_page_length = 100
+crawler_page_length = 12
 # 获取0则停止当前fid
-break_on_count0 = False
+break_on_count0 = True
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
