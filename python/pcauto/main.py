@@ -41,14 +41,14 @@ vehcle_type = {
     "suv": "2",
     "mpv": "3"
 }
-vtype = vehcle_type['mpv']
+vtype = vehcle_type['suv']
 
 # from_local = True
 from_local = False
 snowflake_port = 8910
 
-start = '2021-11'
-end = '2021-11'
+start = '2021-12'
+end = '2021-12'
 
 
 def get_html(vehicle_type, data_year, data_month):
