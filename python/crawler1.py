@@ -28,8 +28,8 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%y-%m-%d %H:%M:%S')
 
 # 69c.org
-# domain="t66y.com"
-domain = "cl.2790x.xyz"
+domain = "t66y.com"
+# domain = "cl.2790x.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -42,7 +42,7 @@ fids = [26, 25, 15, 2, 21, 4, 5]
 # 爬取起始页
 crawler_page_start = 1
 # 爬取终止页
-crawler_page_length = 12
+crawler_page_length = 100
 # 获取0则停止当前fid
 break_on_count0 = True
 
@@ -84,7 +84,7 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    r = get_url(url, proxy=False, headers={
+    r = get_url(url, proxy=True, headers={
         "authority": domain,
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -287,6 +287,8 @@ def run():
     queue_list = get_queue()
 
     stopped = {}
+    for id in fids:
+        stopped[f'fid{id}'] = ''
 
     if len(queue_list) == 0:
         logging.info("queue_list is empty")
@@ -297,11 +299,15 @@ def run():
         key = 'fid' + str(fid)
         url = f'http://{domain}/thread0806.php?fid={str(fid)}&search=&page={str(n)}'
         count = -1
-        if key not in stopped:
+        if break_on_count0 and stopped[key] == '111':
+            continue
+        if stopped[key] != '111':
             count = handle_single_page(url)
             time.sleep(3)
-        if count == 0 and break_on_count0:
-            stopped[key] = 1
+        if count == 0:
+            stopped[key] = stopped[key] + '1'
+        else:
+            stopped[key] = ''
         sql = f"update crawler_queue set status = 'done', get_count = {count} where id = {one.id}"
         dbutils.update(conn, sql)
     conn.close()
