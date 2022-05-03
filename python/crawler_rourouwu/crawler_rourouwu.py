@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 site = 'https://www.rourouwu.com'
 
-book_index_url = site + '/read/103811/'
+book_index_url = site + '/read/63733/'
 
 
 def get_homepage():
@@ -52,6 +52,13 @@ def get_chapter(chapter_url):
     return "\n".join([x.strip() for x in raw.split("\n")])
 
 
+def fix_win_filename(title):
+    arr = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
+    for w in arr:
+        title = title.replace(w, '_')
+    return title
+
+
 def run():
     print("start")
     homepage = get_homepage()
@@ -60,6 +67,7 @@ def run():
     # print homepage
     index_page = BeautifulSoup(homepage, "html.parser")
     title = index_page.find("div", class_="infotitle").h1.text  # 书名
+    title = fix_win_filename(title)
     author = index_page.find("div", class_="infotitle").span.a.text  # 作者
     ddlist = index_page.find_all("dd", class_="chapter_list")  # 章节列表
     chapters = []
