@@ -28,8 +28,8 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%y-%m-%d %H:%M:%S')
 
 # 69c.org
-domain = "t66y.com"
-# domain = "cl.2790x.xyz"
+# domain = "t66y.com"
+domain = "cl.2790x.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -42,7 +42,7 @@ fids = [26, 25, 15, 2, 21, 4, 5]
 # 爬取起始页
 crawler_page_start = 1
 # 爬取终止页
-crawler_page_length = 100
+crawler_page_length = 50
 # 获取0则停止当前fid
 break_on_count0 = True
 
@@ -84,7 +84,7 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    r = get_url(url, proxy=True, headers={
+    r = get_url(url, proxy=False, headers={
         "authority": domain,
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -300,6 +300,8 @@ def run():
         url = f'http://{domain}/thread0806.php?fid={str(fid)}&search=&page={str(n)}'
         count = -1
         if break_on_count0 and stopped[key] == '111':
+            sql = f"update crawler_queue set status = 'done', get_count = 0 where fid = {str(fid)} and status = 'new'"
+            dbutils.update(conn, sql)
             continue
         if stopped[key] != '111':
             count = handle_single_page(url)
