@@ -2,10 +2,11 @@
 # crawler for dd373, wow gold sale
 #
 import logging
-import dd373
+
 from bs4 import BeautifulSoup
-import utils
-from utils import redis_conn_master001
+
+import utils1
+from utils1 import redis_conn_master001
 
 url_base = 'http://www.nfuwow.com/wowtoken/index.html'
 # is_from_local = True
@@ -52,7 +53,7 @@ def resolve_by_bs4(html):
 
 def save_redis(rate):
     with redis_conn_master001() as r:
-        r.set(utils.redis_w_key, rate)  # save
+        r.set(utils1.redis_w_key, rate)  # save
 
 
 def handle_single_page(url):

@@ -1,14 +1,16 @@
 # coding:utf-8
 # crawler for dd373, wow gold sale
 #
-import re
-import traceback
-import utils
 import logging
+import re
 import smtplib
+import traceback
 from email.mime.text import MIMEText
 from email.utils import formataddr
+
 from bs4 import BeautifulSoup
+
+import utils1
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
@@ -22,7 +24,7 @@ toggle_rate = 0.9
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    s = utils.curl_get(url, proxy=False, gzip=True, timeout=60, headers={
+    s = utils1.curl_get(url, proxy=False, gzip=True, timeout=60, headers={
         "authority": "t66y.com",
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -51,7 +53,7 @@ def get_page_html(url):
 
 
 def get_toggle_price1():
-    return utils.get_token_rate() * toggle_rate
+    return utils1.get_token_rate() * toggle_rate
 
 
 def resolve_by_regex(html):
@@ -83,13 +85,16 @@ def resolve_by_bs4(html):
         })
     l2.sort(key=lambda x: x['rate'])
     # logging.info(l2)
-    #期待折扣 toggle_rate
-    token_rate = utils.get_token_rate() #时光汇率
-    rate = token_rate * toggle_rate #目标汇率
-    real_rate = l2[0]['rate'] / token_rate #实际折扣
-    gold_amount = float(l2[0]['price'][0:l2[0]['price'].index('金')]) #平台汇率
-    msg = "toggle_rate={}, real_rate={}, token_amount={}, target_amount={}, real_amount={}".format(str(toggle_rate), str(real_rate), 
-        str(token_rate), str(rate), str(l2[0]['rate']))
+    # 期待折扣 toggle_rate
+    token_rate = utils1.get_token_rate()  # 时光汇率
+    rate = token_rate * toggle_rate  # 目标汇率
+    real_rate = l2[0]['rate'] / token_rate  # 实际折扣
+    gold_amount = float(l2[0]['price'][0:l2[0]['price'].index('金')])  # 平台汇率
+    msg = "toggle_rate={}, real_rate={}, token_amount={}, target_amount={}, real_amount={}".format(str(toggle_rate),
+                                                                                                   str(real_rate),
+                                                                                                   str(token_rate),
+                                                                                                   str(rate),
+                                                                                                   str(l2[0]['rate']))
     logging.info(msg)
     if l2[0]['rate'] < rate and gold_amount >= 1000:
         send_mail(msg, msg)
