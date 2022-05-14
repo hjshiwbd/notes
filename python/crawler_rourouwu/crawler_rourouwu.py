@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 site = 'https://www.rourouwu.com'
 
-book_index_url = site + '/read/63733/'
+book_index_url = site + '/read/51295/'
 
 
 def get_homepage():
