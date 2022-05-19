@@ -7,7 +7,7 @@ import utils
 from bs4 import BeautifulSoup
 
 use_local_file = False
-book_index = 'https://www.xbiquge.so/book/51615'
+book_index = 'https://www.xbiquge.so/book/1805'
 
 
 # /33497012.html'
@@ -35,7 +35,7 @@ def get_chatpter_content(chapter_url):
     arr.append(chapter_name)
 
     content = d2[0].decode_contents()
-    content = content.replace('<br>', '<br/>')
+    content = content.replace('<br>', '<br/>').replace('</br>','<br/>')
     arr = arr + [s1.strip() for s1 in content.split('<br/>')]
     return arr
 
@@ -84,6 +84,8 @@ def run():
     for index, chapter_url in enumerate(book_pages):
         text_arr = get_chatpter_content(chapter_url)
         output.write("\n".join(text_arr))
+        output.write("\n")
+        output.write("\n")
         print(f'{index + 1}/{ll} done')
 
     output.close()
