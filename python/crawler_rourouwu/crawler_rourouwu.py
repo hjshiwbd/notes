@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 site = 'https://www.rourouwu.com'
 
-book_index_url = site + '/read/51295/'
+book_index_url = site + '/read/118642/'
 
 
 def get_homepage():
@@ -18,7 +18,7 @@ def get_homepage():
     s.encoding = 'gbk'
     return s.text
 
-
+2
 def get_homepage_local():
     fileio = open("C:\\Users\\Administrator\\Desktop\\rourouwu1.html")
     return "\n".join([line.strip() for line in fileio.readlines()])
