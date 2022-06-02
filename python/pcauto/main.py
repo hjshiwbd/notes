@@ -41,14 +41,14 @@ vehcle_type = {
     "suv": "2",
     "mpv": "3"
 }
-vtype = vehcle_type['mpv']
+vtype = ['1','2','3']
 
 # from_local = True
 from_local = False
 snowflake_port = 8910
 
-start = '2022-01'
-end = '2022-01'
+start = '2022-02'
+end = '2022-04'
 
 
 def get_html(vehicle_type, data_year, data_month):
@@ -123,9 +123,10 @@ def run():
     snowflake_init()
     d = datetime.datetime.strptime(start, '%Y-%m')
     while True:
-        handle_one_month(vtype, d)
-        logging.info("processing")
-        time.sleep(3)
+        for i in vtype:
+            handle_one_month(i, d)
+            logging.info("processing")
+            time.sleep(3)
         d = d + relativedelta(months=1)
         d2 = d.strftime('%Y-%m')
 
