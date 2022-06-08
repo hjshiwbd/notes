@@ -7,10 +7,7 @@ import utils
 from bs4 import BeautifulSoup
 
 use_local_file = False
-book_index = 'https://www.xbiquge.so/book/1805'
-
-
-# /33497012.html'
+book_index = 'https://www.xbiquge.so/book/51615'
 
 
 def get_chatper_html(url):
@@ -20,22 +17,22 @@ def get_chatper_html(url):
         arr = [x.strip() for x in io.readlines()]
         s = "".join(arr)
     else:
-        r = utils.get_url(url)
+        r = utils.get_url(url, encoding="gbk")
         s = r.text
     return s
 
 
-def get_chatpter_content(chapter_url):
+def get_chatpter_content(chapter_url, index):
     page_html = get_chatper_html(chapter_url)
     arr = []
     bs = BeautifulSoup(page_html, 'html.parser')
     d1 = bs.select('.bookname h1')
     d2 = bs.select('#content')
     chapter_name = d1[0].text
-    arr.append(chapter_name)
+    arr.append(f'第{index + 1}章 ' + chapter_name)
 
     content = d2[0].decode_contents()
-    content = content.replace('<br>', '<br/>').replace('</br>','<br/>')
+    content = content.replace('<br>', '<br/>').replace('</br>', '<br/>')
     arr = arr + [s1.strip() for s1 in content.split('<br/>')]
     return arr
 
@@ -82,7 +79,7 @@ def run():
 
     ll = len(book_pages)
     for index, chapter_url in enumerate(book_pages):
-        text_arr = get_chatpter_content(chapter_url)
+        text_arr = get_chatpter_content(chapter_url, index)
         output.write("\n".join(text_arr))
         output.write("\n")
         output.write("\n")
