@@ -2,21 +2,27 @@ import time
 
 import utils
 from lxml import etree
+from vars import www_51kanshu_cc as book_info
 
-# 域名
-site_domain = 'https://www.xbiquge.la'
-# 书籍主页
-book_home = site_domain + '/19/19711/'
-# 书籍名称
-xpath_book_name = '//div[@id="info"]/h1/text()'
-# 作者名字
-xpath_book_author = '//div[@id="info"]/p/text()'
-# 章节标题
-xpath_chapter_title = '//div[@id="list"]//dd/a/text()'
-# 章节地址
-xpath_chapter_url = '//div[@id="list"]//dd/a/@href'
-# 章节内容
-xpath_chapter_content = '//div[@id="content"]/text()'
+# # 域名
+# site_domain = 'https://www.xbiquge.la'
+# # 书籍主页
+# book_home = site_domain + '/19/19711/'
+# # 书籍名称
+# xpath_book_name = '//div[@id="info"]/h1/text()'
+# # 作者名字
+# xpath_book_author = '//div[@id="info"]/p/text()'
+# # 章节标题
+# xpath_chapter_title = '//div[@id="list"]//dd/a/text()'
+# # 章节地址
+# xpath_chapter_url = '//div[@id="list"]//dd/a/@href'
+# # 章节内容
+# xpath_chapter_content = '//div[@id="content"]/text()'
+# 恢复下载
+
+# 书籍地址
+book_home = '/book/22340/'
+
 # 恢复下载
 is_resume = False
 # 恢复下载的章节数
@@ -39,7 +45,7 @@ def get_book_home():
         f = open('1.html', encoding="utf-8")
         return ''.join([x.strip() for x in f.readlines()])
     else:
-        s = utils.get_url(book_home, encoding='utf-8')
+        s = utils.get_url(book_info.get_book_home(book_home), encoding='utf-8')
         return s.text
 
 
@@ -47,17 +53,17 @@ def run():
     book_home = get_book_home()
     book_home = etree.HTML(book_home)
 
-    book_name = book_home.xpath('//div[@id="info"]/h1/text()')[0]
-    author = book_home.xpath('//div[@id="info"]/p/text()')[0]
+    book_name = book_home.xpath(book_info.xpath_book_name)[0]
+    author = book_home.xpath(book_info.xpath_book_author)[0]
     author = get_author(author)
-    chapter_title = book_home.xpath('//div[@id="list"]//dd/a/text()')
-    chapter_url = book_home.xpath('//div[@id="list"]//dd/a/@href')
+    chapter_title = book_home.xpath(book_info.xpath_chapter_title)
+    chapter_url = book_home.xpath(book_info.xpath_chapter_url)
     list = []
     for i in range(len(chapter_title)):
         url = chapter_url[i]
         if not url.startswith('http'):
-            url = site_domain + url
-        list.append({'title': chapter_title[i], 'url': url})
+            url = book_info.site_domain + url
+        list.append({'title': chapter_title[i].strip(), 'url': url})
 
     mode = 'a' if is_resume else 'w'
     fw = open(f'{author} - {book_name}.txt', mode, encoding='utf-8')
@@ -70,7 +76,7 @@ def run():
         title = c['title']
         s = utils.get_url(url, encoding='utf-8')
         html = etree.HTML(s.text)
-        content = html.xpath('//div[@id="content"]/text()')
+        content = html.xpath(book_info.xpath_chapter_content)
 
         title_txt = f'第{i + 1}章 {title}'
         content_txt = '\n'.join([x.strip() for x in content])
