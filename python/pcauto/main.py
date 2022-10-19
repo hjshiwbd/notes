@@ -34,21 +34,21 @@ logging.basicConfig(level=logging.INFO,
 mysql_host = '192.168.0.115'
 mysql_port = 3306
 mysql_user = 'huangj'
-mysql_pass = 'hUaNgj_2020'
+mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 vehcle_type = {
     "car": "1",
     "suv": "2",
     "mpv": "3"
 }
-vtype = ['1','2','3']
+vtype = ['1', '2', '3']
 
 # from_local = True
 from_local = False
 snowflake_port = 8910
 
-start = '2022-05'
-end = '2022-05'
+start = '2022-08'
+end = '2022-09'
 
 
 def get_html(vehicle_type, data_year, data_month):
@@ -110,7 +110,7 @@ def handle_one_month(vehicle_type, date):
             "vehicle_type": vehicle_type
         })
     with utils.connect(mysql_host, mysql_port, mysql_user, mysql_pass) as conn:
-        sql = "insert into torna.vehicle_sales_pcauto (id, data_date, data_year, data_month, `rank`, brand_lv1, " \
+        sql = "insert into test.vehicle_sales_pcauto (id, data_date, data_year, data_month, `rank`, brand_lv1, " \
               "brand_lv2, price_min, price_max, sales_num, vehicle_type) values " \
               "(%(id)s, %(data_date)s, %(data_year)s, " \
               "%(data_month)s, %(rank)s, %(brand_lv1)s, %(brand_lv2)s, %(price_min)s, %(price_max)s, " \
