@@ -7,7 +7,7 @@ import utils
 from bs4 import BeautifulSoup
 
 use_local_file = False
-book_index = 'https://www.xbiquge.so/book/1037'
+book_index = 'https://www.xbiquge.so/book/4'
 
 
 def get_chatper_html(url):
