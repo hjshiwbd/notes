@@ -15,6 +15,12 @@ CREATE TABLE `vehicle_sales_pcauto` (
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+pip:
+pip install pysnowflake
+pip install BeautifulSoup4
+pip install html5lib
 """
 
 import datetime
@@ -33,6 +39,8 @@ logging.basicConfig(level=logging.INFO,
 
 mysql_host = '192.168.0.115'
 mysql_port = 3306
+mysql_host = 'slave001.yz'
+mysql_port = 11502
 mysql_user = 'huangj'
 mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
@@ -47,8 +55,8 @@ vtype = ['1', '2', '3']
 from_local = False
 snowflake_port = 8910
 
-start = '2022-08'
-end = '2022-09'
+start = '2022-10'
+end = '2022-11'
 
 
 def get_html(vehicle_type, data_year, data_month):

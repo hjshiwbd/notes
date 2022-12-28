@@ -3,16 +3,30 @@
 """
 create database crawler;
 CREATE TABLE `t66y_article` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `original_id` bigint(20) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `author_name` varchar(100) DEFAULT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `fid` int DEFAULT NULL,
+  `original_id` bigint DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `author_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `post_date` datetime DEFAULT NULL,
-  `link` varchar(255) DEFAULT NULL,
+  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `t66y_original_id` (`original_id`),
+  KEY `t66y_idx_post_date` (`post_date`),
+  KEY `t66y_idx_fid` (`fid`)
+) ENGINE=InnoDB AUTO_INCREMENT=698625 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE `crawler_queue` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `date` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fid` int DEFAULT NULL,
+  `page` int DEFAULT NULL,
+  `status` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'new',
+  `get_count` int DEFAULT NULL COMMENT '结果行数',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=26219 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 """
 
 import logging
@@ -29,7 +43,7 @@ logging.basicConfig(level=logging.INFO,
 
 # 69c.org
 # domain = "t66y.com"
-domain = "cl.2790x.xyz"
+domain = "cl.5297x.xyz"
 
 # is_from_local = True
 is_from_local = False
