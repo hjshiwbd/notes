@@ -39,8 +39,6 @@ logging.basicConfig(level=logging.INFO,
 
 mysql_host = '192.168.0.115'
 mysql_port = 3306
-mysql_host = 'slave001.yz'
-mysql_port = 11502
 mysql_user = 'huangj'
 mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
