@@ -27,15 +27,17 @@ CREATE TABLE `crawler_queue` (
   `get_count` int DEFAULT NULL COMMENT '结果行数',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=26219 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+pip3 install bs4  mysql-connector-python
 """
 
 import logging
 import time
 import traceback
 
+import dbutils
 import requests
 from bs4 import BeautifulSoup
-from jputils import dbutils
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
@@ -56,7 +58,7 @@ fids = [26, 25, 15, 2, 21, 4, 5]
 # 爬取起始页
 crawler_page_start = 1
 # 爬取终止页
-crawler_page_length = 50
+crawler_page_length = 100
 # 获取0则停止当前fid
 break_on_count0 = True
 
