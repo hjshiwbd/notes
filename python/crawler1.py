@@ -35,9 +35,13 @@ import logging
 import time
 import traceback
 
-import utils
 import requests
+import utils
+import brotli
 from bs4 import BeautifulSoup
+import urllib.request
+import urllib3
+import http.cookiejar
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
@@ -45,7 +49,7 @@ logging.basicConfig(level=logging.INFO,
 
 # 69c.org
 # domain = "t66y.com"
-domain = "cl.5297x.xyz"
+domain = "cl.5979x.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -79,7 +83,7 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
             proxies = {
                 'http': 'http://127.0.0.1:7890'
             }
-        return session.get(url, params=data, headers=headers, proxies=proxies, timeout=20)
+        return session.get(url, params=data, headers=headers, proxies=proxies, timeout=(5, 5))
 
     if url == "":
         raise Exception("no url")
@@ -97,21 +101,62 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
         raise Exception(m)
 
 
+def get_url2(url):
+    req = urllib.request.Request(url)
+    req.add_header(':authority', domain)
+    req.add_header(':method', 'GET')
+    path = '/' + url.split('/')[-1]
+    req.add_header(':path', path)
+    req.add_header('user-agent',
+                   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36')
+    response = urllib.request.urlopen(req)
+    return response
+
+
+def get_url3(url):
+    http = urllib3.PoolManager()
+    headers = {
+        b':authority': bytes(domain, encoding="utf8"),
+        b'user-agent': b'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+    }
+    r = http.request('GET', url, headers=headers)
+    return r.data.decode('utf-8')
+
+
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    r = get_url(url, proxy=False, headers={
+
+    # 最后一个"/"后的内容
+    path = '/' + url.split('/')[-1]
+    header_old = {
         "authority": domain,
         "method": "GET",
-        "path": "/thread0806.php?fid=25",
+        "path": path,
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6",
+        "sec-ch-ua": '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
         "Proxy-Connection": "keep-alive",
         "Cache-Control": "max-age=0",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.1 10/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-        "Accept-Encoding": "gzip, deflate",
-        "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-    })
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
+    }
+    header = (
+        (":authority", domain),
+        (":method", "GET"),
+        (":path", path),
+    )
+
+    r = get_url(url, proxy=False, headers=header_old)
+    # r = get_url2(url)
+    # r = get_url3(url)
 
     r.encoding = 'utf-8'
     return r.text
@@ -140,7 +185,7 @@ def resolve_html(page_obj):
 
 
 def get_conn():
-    return utils.connect('localhost',3306,'root','root')
+    return utils.connect('localhost', 3306, 'root', 'root')
 
 
 def save_my_db(sqls):
@@ -149,7 +194,7 @@ def save_my_db(sqls):
     for sql in sqls:
         # print sql
         try:
-            utils.update(conn, sql)
+            utils.update(conn, sql, show_log=False)
         except Exception as e:
             logging.info(sql)
             traceback.print_exc()
@@ -183,7 +228,7 @@ SELECT * FROM crawler.`t66y_article` where original_id in (%s)
     """ % ids
 
     conn = get_conn()
-    exist_list = utils.query_list(conn, sql)
+    exist_list = utils.query_list(conn, sql, show_log=False)
     conn.close()
     return [o.original_id for o in exist_list]
 
@@ -202,6 +247,7 @@ def get_id_from_href(href):
 
     # id = get_id_from_href(href.split("/")[3][0:-5]  # "/"到".html"之间的数字,即其原文id)
 
+
 def get_create_date_v2304(tds):
     """
     新版解析
@@ -210,7 +256,7 @@ def get_create_date_v2304(tds):
     """
     title = tds[2].div.span['title']
     if tds[2].div.span.has_attr('data-timestamp'):
-        t = tds[2].div.span['data-timestamp'].replace('s','')
+        t = tds[2].div.span['data-timestamp'].replace('s', '')
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(t)))
     elif '置顶主题：' in title:
         return title.replace('置顶主题：', '')
@@ -289,9 +335,6 @@ def get_queue():
     存在,取到队列,爬取
     """
     date = time.strftime("%y%m%d", time.localtime())
-    # sql = "select * from crawler_queue where date = %(date)s"
-    # cc = dbutils.query_list(conn, sql, params={"date": date})
-    # if len(cc) == 0:
     arr = []
     for id in fids:
         for n in range(crawler_page_start, crawler_page_length + 1):
@@ -304,11 +347,11 @@ def get_queue():
     sql_count = "select count(*) cc from crawler.crawler_queue where date = %(date)s and fid = %(fid)s and page =%(page)s"
     sql_insert = "INSERT INTO crawler.`crawler_queue`(`date`, `fid`, `page`) VALUES ( %(date)s, %(fid)s, %(page)s) "
     for one in arr:
-        v = utils.query_one(conn, sql_count, one)
+        v = utils.query_one(conn, sql_count, one, show_log=False)
         if v.cc == 0:
-            utils.update(conn, sql_insert, one)
+            utils.update(conn, sql_insert, one, show_log=False)
     sql = "select * from crawler.crawler_queue where date = %(date)s and status='new'"
-    cc = utils.query_list(conn, sql, {"date": date})
+    cc = utils.query_list(conn, sql, {"date": date}, show_log=False)
     return [k for k in cc if k.status == 'new']
 
 
@@ -333,7 +376,7 @@ def run():
         count = -1
         if break_on_count0 and stopped[key] == '111':
             sql = f"update crawler.crawler_queue set status = 'done', get_count = 0 where fid = {str(fid)} and status = 'new'"
-            utils.update(conn, sql)
+            utils.update(conn, sql, show_log=False)
             continue
         if stopped[key] != '111':
             count = handle_single_page(url)
@@ -343,7 +386,7 @@ def run():
         else:
             stopped[key] = ''
         sql = f"update crawler.crawler_queue set status = 'done', get_count = {count} where id = {one.id}"
-        utils.update(conn, sql)
+        utils.update(conn, sql, show_log=False)
     conn.close()
     logging.info("done")
 
