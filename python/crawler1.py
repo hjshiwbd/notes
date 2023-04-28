@@ -35,7 +35,7 @@ import logging
 import time
 import traceback
 
-import dbutils
+import utils
 import requests
 from bs4 import BeautifulSoup
 
@@ -140,7 +140,7 @@ def resolve_html(page_obj):
 
 
 def get_conn():
-    return dbutils.get_conn('root', 'root', 'localhost', 3306, 'crawler');
+    return utils.connect('localhost',3306,'root','root')
 
 
 def save_my_db(sqls):
@@ -149,10 +149,11 @@ def save_my_db(sqls):
     for sql in sqls:
         # print sql
         try:
-            dbutils.update(conn, sql)
+            utils.update(conn, sql)
         except Exception as e:
             logging.info(sql)
             traceback.print_exc()
+            raise e
         count += 1
     logging.info("%d inserted" % count)
     conn.close()
@@ -178,11 +179,11 @@ def query_exist(articles):
         raise 'article ids is empty'
 
     sql = """
-SELECT * FROM `t66y_article` where original_id in (%s)
+SELECT * FROM crawler.`t66y_article` where original_id in (%s)
     """ % ids
 
     conn = get_conn()
-    exist_list = dbutils.query_list(conn, sql)
+    exist_list = utils.query_list(conn, sql)
     conn.close()
     return [o.original_id for o in exist_list]
 
@@ -200,6 +201,21 @@ def get_id_from_href(href):
         return href[start:end]
 
     # id = get_id_from_href(href.split("/")[3][0:-5]  # "/"到".html"之间的数字,即其原文id)
+
+def get_create_date_v2304(tds):
+    """
+    新版解析
+    :param tds:
+    :return:
+    """
+    title = tds[2].div.span['title']
+    if tds[2].div.span.has_attr('data-timestamp'):
+        t = tds[2].div.span['data-timestamp'].replace('s','')
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(t)))
+    elif '置顶主题：' in title:
+        return title.replace('置顶主题：', '')
+    else:
+        raise 'parse create_date failed'
 
 
 def get_create_date(tds):
@@ -250,7 +266,7 @@ def handle_single_page(url):
         title = dom_link.get_text().replace("'", "''").replace("\\", "\\\\")
         # print(len(tds[1]))
         author = tds[2].a.get_text()
-        create_date = get_create_date(tds)
+        create_date = get_create_date_v2304(tds)
         # print(create_date)
         o = {
             "id": id,
@@ -285,14 +301,14 @@ def get_queue():
                 "date": date,
             })  # 子栏目id, 爬前n页数
 
-    sql_count = "select count(*) cc from crawler_queue where date = %(date)s and fid = %(fid)s and page =%(page)s"
-    sql_insert = "INSERT INTO `crawler_queue`(`date`, `fid`, `page`) VALUES ( %(date)s, %(fid)s, %(page)s) "
+    sql_count = "select count(*) cc from crawler.crawler_queue where date = %(date)s and fid = %(fid)s and page =%(page)s"
+    sql_insert = "INSERT INTO crawler.`crawler_queue`(`date`, `fid`, `page`) VALUES ( %(date)s, %(fid)s, %(page)s) "
     for one in arr:
-        v = dbutils.query_one(conn, sql_count, one)
+        v = utils.query_one(conn, sql_count, one)
         if v.cc == 0:
-            dbutils.update(conn, sql_insert, one)
-    sql = "select * from crawler_queue where date = %(date)s and status='new'"
-    cc = dbutils.query_list(conn, sql, {"date": date})
+            utils.update(conn, sql_insert, one)
+    sql = "select * from crawler.crawler_queue where date = %(date)s and status='new'"
+    cc = utils.query_list(conn, sql, {"date": date})
     return [k for k in cc if k.status == 'new']
 
 
@@ -316,8 +332,8 @@ def run():
         url = f'http://{domain}/thread0806.php?fid={str(fid)}&search=&page={str(n)}'
         count = -1
         if break_on_count0 and stopped[key] == '111':
-            sql = f"update crawler_queue set status = 'done', get_count = 0 where fid = {str(fid)} and status = 'new'"
-            dbutils.update(conn, sql)
+            sql = f"update crawler.crawler_queue set status = 'done', get_count = 0 where fid = {str(fid)} and status = 'new'"
+            utils.update(conn, sql)
             continue
         if stopped[key] != '111':
             count = handle_single_page(url)
@@ -326,8 +342,8 @@ def run():
             stopped[key] = stopped[key] + '1'
         else:
             stopped[key] = ''
-        sql = f"update crawler_queue set status = 'done', get_count = {count} where id = {one.id}"
-        dbutils.update(conn, sql)
+        sql = f"update crawler.crawler_queue set status = 'done', get_count = {count} where id = {one.id}"
+        utils.update(conn, sql)
     conn.close()
     logging.info("done")
 

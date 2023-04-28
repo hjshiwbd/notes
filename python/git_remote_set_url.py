@@ -31,8 +31,9 @@ def git_set_url(path):
         logging.info(e)
         traceback.print_exc()
 
-    if url != "" and "at4" in url:
-        url = url.replace("at4", "wedemo")
+    if url != "" and ":82" in url:
+        # url = url.replace("at4", "wedemo")
+        url = url.replace(":82", "")
         set_cmd = f'git -C "{path}" remote set-url origin {url}'
         logging.info(set_cmd)
         os.popen(set_cmd)
@@ -44,7 +45,7 @@ def run():
     # path = "D:\\git\\yuzhi\\apartment-mpw"
     # git_set_url(path)
 
-    root = "G:\\git\\yuzhi"
+    root = "D:\\git\\yuzhi"
     dirlist = os.listdir(root)
 
     ignore = ['!new folder']
@@ -55,16 +56,16 @@ def run():
                 p = os.path.join(root, d)
                 logging.info(p)
                 git_set_url(p)
-            else:
-                if d not in ignore:
-                    # d=!xx d+child1+child1-1=!xx/[ver]/prjname
-                    prefix_emark = os.path.join(root, d)  # "!"开头
-                    children1 = os.listdir(prefix_emark)  # ver
-                    for child1 in children1:
-                        c1 = os.listdir(os.path.join(root, d, child1))  # prjname
-                        pp = os.path.join(prefix_emark, child1, c1[0])
-                        logging.info(pp)
-                        git_set_url(pp)
+            # else:
+            #     if d not in ignore:
+            #         # d=!xx d+child1+child1-1=!xx/[ver]/prjname
+            #         prefix_emark = os.path.join(root, d)  # "!"开头
+            #         children1 = os.listdir(prefix_emark)  # ver
+            #         for child1 in children1:
+            #             c1 = os.listdir(os.path.join(root, d, child1))  # prjname
+            #             pp = os.path.join(prefix_emark, child1, c1[0])
+            #             logging.info(pp)
+            #             git_set_url(pp)
 
 
 if __name__ == '__main__':
