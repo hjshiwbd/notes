@@ -65,6 +65,8 @@ crawler_page_start = 1
 crawler_page_length = 100
 # 获取0则停止当前fid
 break_on_count0 = True
+# 翻页等待时间,second
+sleep_time = 4
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -380,11 +382,12 @@ def run():
             continue
         if stopped[key] != '111':
             count = handle_single_page(url)
-            time.sleep(5)
-        if count == 0:
-            stopped[key] = stopped[key] + '1'
-        else:
-            stopped[key] = ''
+            time.sleep(sleep_time)
+        if break_on_count0:
+            if count == 0:
+                stopped[key] = stopped[key] + '1'
+            else:
+                stopped[key] = ''
         sql = f"update crawler.crawler_queue set status = 'done', get_count = {count} where id = {one.id}"
         utils.update(conn, sql, show_log=False)
     conn.close()
