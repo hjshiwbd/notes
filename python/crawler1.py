@@ -380,7 +380,7 @@ def run():
             continue
         if stopped[key] != '111':
             count = handle_single_page(url)
-            time.sleep(3)
+            time.sleep(5)
         if count == 0:
             stopped[key] = stopped[key] + '1'
         else:
