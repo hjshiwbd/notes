@@ -59,7 +59,7 @@ today = time.strftime('%Y-%m-%d', time.localtime())
 yesterday = time.strftime('%Y-%m-%d', time.localtime(time.time() - 24 * 60 * 60))
 fid = 0
 # 15亚有 25国 2亚无 中文26 欧美4 http21 动画5
-fids = [26, 25, 15, 2, 21, 4, 5]
+fids = [26, 25, 15, 2, 21, 28, 4, 5]
 # 爬取起始页
 crawler_page_start = 1
 # 爬取终止页
