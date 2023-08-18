@@ -45,9 +45,9 @@ xpath_novel_name = '//div[@id="srcbox"]/a[3]/@title'
 # 列表页: 小说作者
 xpath_novel_author = '//div[@class="infotitle"]/span/a/text()'
 # 列表页: 小说章节地址
-xpath_chapter_url = '//dd[@class="chapter_list"][position() >= 9]/a/@href'
+xpath_chapter_url = '//dd[@class="chapter_list"][position() > 9]/a/@href'
 # 内容页: 小说章节标题
-xpath_chapter_title = '//a[@class="titlename"]/b/text()'
+xpath_chapter_title = '//div[@id="main"]/h1/text()'
 # 内容页: 小说章节内容
 xpath_chapter_content = '//div[@id="main"]/div[2]/div/p/text()'
 
