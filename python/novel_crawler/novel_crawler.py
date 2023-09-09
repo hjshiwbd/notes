@@ -9,14 +9,16 @@
   - 获取章节内容的xpath
 
 爬取进度记录
+drop table if exists novel_queue;
 CREATE TABLE `novel_queue` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
+    book_id varchar(500),
   `url` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `page` int DEFAULT NULL,
   `status` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ;
 
 """
 
