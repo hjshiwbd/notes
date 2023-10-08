@@ -22,7 +22,7 @@ class WwwRourouwuNet(Param):
     # 首页
     site_index = 'https://www.rourouwu.net'
     # 列表页
-    novel_list_url = site_index + '/read/92607//'
+    novel_list_url = site_index + '/read/114973//'
     # 117668
     # 字符集
     # novel_site_encoding = 'utf-8'

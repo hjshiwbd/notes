@@ -375,7 +375,7 @@ def run():
         fid = one.fid
         n = one.page
         key = 'fid' + str(fid)
-        url = f'http://{domain}/thread0806.php?fid={str(fid)}&search=&page={str(n)}'
+        url = f'https://{domain}/thread0806.php?fid={str(fid)}&search=&page={str(n)}'
         count = -1
         if break_on_count0 and stopped[key] == '111':
             sql = f"update crawler.crawler_queue set status = 'done', get_count = 0 where fid = {str(fid)} and status = 'new'"
