@@ -176,7 +176,14 @@ def get_page_html(url):
     if is_from_local:
         return from_local()
     else:
-        return from_remote(url)
+        # try 10 times
+        for i in range(10):
+            try:
+                logging.info(f"try {i} times")
+                return from_remote(url)
+            except Exception as e:
+                logging.info(e)
+                time.sleep(5)
 
 
 def resolve_html(page_obj):
