@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" href="/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/logo.png">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-title" content="全网短剧"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta name="theme-color" content="#121212">
+    <meta name="applicable-device" content="pc,mobile"/>
+    <meta name="apple-touch-fullscreen" content="YES"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <title>全网热门短剧大全</title>
+    <script>
+        ; (function flexible(window, document) { var docEl = document.documentElement; var dpr = window.devicePixelRatio || 1; function setBodyFontSize() { if (document.body) { document.body.style.fontSize = (12 * dpr) + 'px' } else { document.addEventListener('DOMContentLoaded', setBodyFontSize) } } function setRemUnit() { var dcw = docEl.clientWidth < 600 ? docEl.clientWidth : 600; var rem = dcw / 7.5; docEl.style.fontSize = rem + 'px' } setRemUnit(); window.addEventListener('resize', setRemUnit); window.addEventListener('pageshow', function (e) { if (e.persisted) { setRemUnit() } }); if (dpr >= 2) { var fakeBody = document.createElement('body'); var testElement = document.createElement('div'); testElement.style.border = '.5px solid transparent'; fakeBody.appendChild(testElement); docEl.appendChild(fakeBody); if (testElement.offsetHeight === 1) { docEl.classList.add('hairlines') } docEl.removeChild(fakeBody) } }(window, document));
+    </script>
+    <script type="module" onerror="window.location.reload()" crossorigin src="assets/index-5051ebbf.js"></script>
+    <link rel="stylesheet" href="assets/index-8a7dc374.css">
+</head>
+
+<body>
+<div id="app">
+    <style>
+        #loader-wrapper {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 999999;
+          background: #121212;
+        }
+
+        #loader {
+          display: block;
+          position: relative;
+          left: 50%;
+          top: 50%;
+          width: 100px;
+          height: 100px;
+          margin: -50px 0 0 -50px;
+          border-radius: 50%;
+          border: 3px solid transparent;
+          border-top-color: #FFF;
+          -webkit-animation: spin 2s linear infinite;
+          -ms-animation: spin 2s linear infinite;
+          -moz-animation: spin 2s linear infinite;
+          -o-animation: spin 2s linear infinite;
+          animation: spin 2s linear infinite;
+          z-index: 1001;
+        }
+
+        #loader:before {
+          content: "";
+          position: absolute;
+          top: 5px;
+          left: 5px;
+          right: 5px;
+          bottom: 5px;
+          border-radius: 50%;
+          border: 3px solid transparent;
+          border-top-color: #FFF;
+          -webkit-animation: spin 3s linear infinite;
+          -moz-animation: spin 3s linear infinite;
+          -o-animation: spin 3s linear infinite;
+          -ms-animation: spin 3s linear infinite;
+          animation: spin 3s linear infinite;
+        }
+
+        #loader:after {
+          content: "";
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          right: 15px;
+          bottom: 15px;
+          border-radius: 50%;
+          border: 3px solid transparent;
+          border-top-color: #FFF;
+          -moz-animation: spin 1.5s linear infinite;
+          -o-animation: spin 1.5s linear infinite;
+          -ms-animation: spin 1.5s linear infinite;
+          -webkit-animation: spin 1.5s linear infinite;
+          animation: spin 1.5s linear infinite;
+        }
+
+
+        @-webkit-keyframes spin {
+          0% {
+            -webkit-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            transform: rotate(0deg);
+          }
+
+          100% {
+            -webkit-transform: rotate(360deg);
+            -ms-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes spin {
+          0% {
+            -webkit-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            transform: rotate(0deg);
+          }
+
+          100% {
+            -webkit-transform: rotate(360deg);
+            -ms-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+
+        .loaded #loader {
+          opacity: 0;
+          -webkit-transition: all 0.3s ease-out;
+          transition: all 0.3s ease-out;
+        }
+
+        .loaded #loader-wrapper {
+          visibility: hidden;
+          -webkit-transform: translateY(-100%);
+          -ms-transform: translateY(-100%);
+          transform: translateY(-100%);
+          -webkit-transition: all 0.3s 1s ease-out;
+          transition: all 0.3s 1s ease-out;
+        }
+    </style>
+    <div id="loader-wrapper">
+        <div id="loader"></div>
+    </div>
+</div>
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baitdu.com/count.js?a5de315acb973b8e6da83458c9e456d3";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+</body>
+
+</html>

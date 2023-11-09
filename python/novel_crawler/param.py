@@ -75,3 +75,27 @@ class WwwRourouwuNet(Param):
             return f'{self.site_index}/read/{arr[1]}/{arr[0]}/'
         else:
             return self.site_index + url
+
+
+class BeqegeCc(Param):
+    """
+    https://www.beqege.cc/75040/
+    """
+    # 首页
+    site_index = 'https://www.beqege.cc'
+    # 列表页
+    novel_list_url = site_index + '/75040/'
+    # 117668
+    # 字符集
+    novel_site_encoding = 'utf-8'
+    # novel_site_encoding = 'gbk'
+    # 列表页: 小说名称
+    xpath_novel_name = '//div[@id="srcbox"]/a[3]/@title'
+    # 列表页: 小说作者
+    xpath_novel_author = '//div[@class="infotitle"]/span/a/text()'
+    # 列表页: 小说章节地址
+    xpath_chapter_url = '//dd[@class="chapter_list"][position() > {count}]/a/@href'
+    # 内容页: 小说章节标题
+    xpath_chapter_title = '//div[@id="main"]/h1/text()'
+    # 内容页: 小说章节内容
+    xpath_chapter_content = '//div[@id="main"]/div[2]/div/p/text()'
