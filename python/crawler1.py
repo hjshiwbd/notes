@@ -67,7 +67,7 @@ crawler_page_length = 100
 # 获取0则停止当前fid
 break_on_count0 = True
 # 翻页等待时间,second
-sleep_time = 4
+sleep_time = 1
 
 
 def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
@@ -179,10 +179,10 @@ def get_page_html(url):
         # try 10 times
         for i in range(10):
             try:
-                logging.info(f"try {i} times")
                 return from_remote(url)
-            except Exception as e:
+            except Exception as e:                
                 logging.info(e)
+                logging.info(f"retry {i} times")
                 time.sleep(5)
 
 
