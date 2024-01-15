@@ -58,8 +58,8 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2023-09'
-end = '2023-09'
+start = '2023-12'
+end = '2023-12'
 
 # vehcle_type = {
 #     "car": "1",
@@ -134,6 +134,7 @@ def get_sales_detail_html(url):
 def get_energy_type(td_arr):
     """
     获取能源类型
+    todo 如果一次获取多个月的数据, 这个方法会重复执行, 需要建立缓存
     :param td_arr:
     :return:
     """
