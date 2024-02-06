@@ -32,8 +32,8 @@ from lxml import etree
 from param import Param, WwwRourouwuNet, Jingshuzhijia
 
 # 把上面属性放到一个对象里面
-# param = WwwRourouwuNet()
-param = Jingshuzhijia()
+param = WwwRourouwuNet()
+# param = Jingshuzhijia()
 
 # from_remote = False
 from_remote = True
@@ -150,7 +150,7 @@ def run():
     for chapter_url in list3:
         # if count > 0:
         #     break
-        chapter_url = chapter_url if chapter_url.startswith('http') else param.site_index + chapter_url
+        # chapter_url = chapter_url if chapter_url.startswith('http') else param.site_index + chapter_url
         r2 = http_get(param.get_url(chapter_url), use_proxy=True, encoding=param.novel_site_encoding)
         count = count + 1
         # logging.info(r2.text)

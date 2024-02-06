@@ -7,12 +7,27 @@ class Param:
         pass
 
     def sort_url(self, list):
+        """
+        显示顺序和实际顺序不一样,调整
+        :param list:
+        :return:
+        """
         return list
 
     def format_xpath(self, html):
+        """
+        所有章节目录里, 有一部分是不需要的(比如某些站的排序规则是最新的10章+从1开始的章节), 在此处处理
+        :param html:
+        :return:
+        """
         return self.xpath_chapter_url
 
     def get_url(self, url):
+        """
+        每一章节的url的处理. 有的没有http开头, 有的不是url是js方法
+        :param url:
+        :return:
+        """
         return url
 
 
@@ -20,10 +35,11 @@ class WwwRourouwuNet(Param):
     """
     https://www.rourouwu.net
     """
+    use_proxy = True
     # 首页
     site_index = 'https://www.rourouwu.net'
     # 列表页
-    novel_list_url = site_index + '/read/114973//'
+    novel_list_url = site_index + '/read/111845/'
     # 117668
     # 字符集
     # novel_site_encoding = 'utf-8'
@@ -111,7 +127,8 @@ https://jinshuzhijia.com/index.php/book/info/lutoujin
     # 首页
     site_index = 'https://jinshuzhijia.com'
     # 列表页
-    novel_list_url = site_index + '/index.php/book/info/lutoujin'
+    # https://jinshuzhijia.com/index.php/book/info/chenlunyinyudejiaoqu
+    novel_list_url = site_index + '/index.php/book/info/chenlunyinyudejiaoqu'
     # 117668
     # 字符集
     novel_site_encoding = 'utf-8'
@@ -126,3 +143,7 @@ https://jinshuzhijia.com/index.php/book/info/lutoujin
     xpath_chapter_title = '//div[@class="rtj-title"]/h1/text()'
     # 内容页: 小说章节内容
     xpath_chapter_content = '//div[@class="tjc-cot"]/p/text()'
+
+    def get_url(self, url):
+        url = url if url.startswith('http') else self.site_index + url
+        return url
