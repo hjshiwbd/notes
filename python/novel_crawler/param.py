@@ -1,5 +1,6 @@
 # 声明一个对象 param 和init方法
 class Param:
+    use_proxy = False
     xpath_chapter_url = ''
 
     def __init__(self):
@@ -99,3 +100,29 @@ class BeqegeCc(Param):
     xpath_chapter_title = '//div[@id="main"]/h1/text()'
     # 内容页: 小说章节内容
     xpath_chapter_content = '//div[@id="main"]/div[2]/div/p/text()'
+
+
+class Jingshuzhijia(Param):
+    """
+https://jinshuzhijia.com/index.php/book/info/lutoujin
+    """
+    # 代理访问
+    use_proxy = True
+    # 首页
+    site_index = 'https://jinshuzhijia.com'
+    # 列表页
+    novel_list_url = site_index + '/index.php/book/info/lutoujin'
+    # 117668
+    # 字符集
+    novel_site_encoding = 'utf-8'
+    # novel_site_encoding = 'gbk'
+    # 列表页: 小说名称
+    xpath_novel_name = '//meta[@name="DC.title"]/@content'
+    # 列表页: 小说作者
+    xpath_novel_author = '//meta[@name="DC.creator"]/@content'
+    # 列表页: 小说章节地址
+    xpath_chapter_url = '//ul[@class="tjzl"]/li/a/@href'
+    # 内容页: 小说章节标题
+    xpath_chapter_title = '//div[@class="rtj-title"]/h1/text()'
+    # 内容页: 小说章节内容
+    xpath_chapter_content = '//div[@class="tjc-cot"]/p/text()'

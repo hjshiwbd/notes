@@ -26,12 +26,14 @@ CREATE TABLE `novel_queue` (
 import logging
 import time
 
+import requests
 import utils
 from lxml import etree
-from param import Param, WwwRourouwuNet
+from param import Param, WwwRourouwuNet, Jingshuzhijia
 
 # 把上面属性放到一个对象里面
-param = WwwRourouwuNet()
+# param = WwwRourouwuNet()
+param = Jingshuzhijia()
 
 # from_remote = False
 from_remote = True
@@ -95,10 +97,34 @@ def update_page_ok(novel_list_url, chapter_url):
     utils.update(conn, sql, {'url': chapter_url, 'bookId': novel_list_url})
 
 
+def http_get(url, **kwargs):
+    proxies = None
+    if 'use_proxy' in kwargs and kwargs['use_proxy']:
+        proxy_server = 'http://127.0.0.1:7890'
+        proxies = {
+            'http': proxy_server,
+            'https': proxy_server
+        }
+    logging.info(f"http_get:{param.novel_list_url}")
+    r = requests.get(url=url, proxies=proxies, timeout=120)
+    r.encoding = param.novel_site_encoding
+    return r
+
+
 def run():
     txt = ''
     if from_remote:
-        r = utils.get_url(param.novel_list_url, encoding=param.novel_site_encoding)
+        # proxies = None
+        # if param.use_proxy:
+        #     proxy_server = 'http://127.0.0.1:7890'
+        #     proxies = {
+        #         'http': proxy_server,
+        #         'https': proxy_server
+        #     }
+        # logging.info(f"book index:{param.novel_list_url}")
+        # r = requests.get(url=param.novel_list_url, proxies=proxies, timeout=120)
+        # r.encoding = param.novel_site_encoding
+        r = http_get(url=param.novel_list_url, use_proxy=True, encoding=param.novel_site_encoding)
         txt = r.text
     else:
         txt = utils.read_file('list.html', encoding=param.novel_site_encoding)
@@ -124,7 +150,8 @@ def run():
     for chapter_url in list3:
         # if count > 0:
         #     break
-        r2 = utils.get_url(param.get_url(chapter_url), encoding=param.novel_site_encoding)
+        chapter_url = chapter_url if chapter_url.startswith('http') else param.site_index + chapter_url
+        r2 = http_get(param.get_url(chapter_url), use_proxy=True, encoding=param.novel_site_encoding)
         count = count + 1
         # logging.info(r2.text)
         html2 = etree.HTML(r2.text, etree.HTMLParser(encoding=param.novel_site_encoding))
