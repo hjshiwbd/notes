@@ -29,10 +29,10 @@ import time
 import requests
 import utils
 from lxml import etree
-from param import Param, WwwRourouwuNet, Jingshuzhijia
+from param import *
 
 # 把上面属性放到一个对象里面
-param = WwwRourouwuNet()
+param = BiquxsCom()
 # param = Jingshuzhijia()
 
 # from_remote = False
@@ -105,8 +105,15 @@ def http_get(url, **kwargs):
             'http': proxy_server,
             'https': proxy_server
         }
-    logging.info(f"http_get:{param.novel_list_url}")
-    r = requests.get(url=url, proxies=proxies, timeout=120)
+    logging.info(f"http_get:{url}")
+
+    other_args = {}
+    if 'headers' in kwargs:
+        other_args['headers'] = kwargs['headers']
+    if 'cookie' in kwargs:
+        other_args['cookies'] = kwargs['cookies']
+
+    r = requests.get(url=url, proxies=proxies, timeout=120, **other_args)
     r.encoding = param.novel_site_encoding
     return r
 
@@ -124,7 +131,11 @@ def run():
         # logging.info(f"book index:{param.novel_list_url}")
         # r = requests.get(url=param.novel_list_url, proxies=proxies, timeout=120)
         # r.encoding = param.novel_site_encoding
-        r = http_get(url=param.novel_list_url, use_proxy=True, encoding=param.novel_site_encoding)
+
+        kwargs = {}
+        kwargs.update(param.__dict__)
+
+        r = http_get(url=param.novel_list_url, **kwargs)
         txt = r.text
     else:
         txt = utils.read_file('list.html', encoding=param.novel_site_encoding)
@@ -151,11 +162,15 @@ def run():
         # if count > 0:
         #     break
         # chapter_url = chapter_url if chapter_url.startswith('http') else param.site_index + chapter_url
-        r2 = http_get(param.get_url(chapter_url), use_proxy=True, encoding=param.novel_site_encoding)
+
+        kwargs = {}
+        kwargs.update(param.__dict__)
+        r2 = http_get(param.get_url(chapter_url), **kwargs)
         count = count + 1
         # logging.info(r2.text)
         html2 = etree.HTML(r2.text, etree.HTMLParser(encoding=param.novel_site_encoding))
         chapter_title = html2.xpath(param.xpath_chapter_title)[0]
+        chapter_title = param.get_chapter_title(chapter_title)
         output_str += f'第{count}章 ' + chapter_title.strip() + '\n'
         chapter_content = html2.xpath(param.xpath_chapter_content)
         for line in chapter_content:

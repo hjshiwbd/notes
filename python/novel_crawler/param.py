@@ -16,7 +16,7 @@ class Param:
 
     def format_xpath(self, html):
         """
-        所有章节目录里, 有一部分是不需要的(比如某些站的排序规则是最新的10章+从1开始的章节), 在此处处理
+        获取所有章节目录. 在所有章节目录里, 有一部分是不需要的(比如某些站的排序规则是最新的10章+从1开始的章节), 在此处处理
         :param html:
         :return:
         """
@@ -29,6 +29,14 @@ class Param:
         :return:
         """
         return url
+
+    def get_chapter_title(self, str):
+        """
+        通过xpath获取到内容后,二次处理
+        :param str:
+        :return:
+        """
+        return str
 
 
 class WwwRourouwuNet(Param):
@@ -98,10 +106,12 @@ class BeqegeCc(Param):
     """
     https://www.beqege.cc/75040/
     """
+    # 代理
+    use_proxy = False
     # 首页
     site_index = 'https://www.beqege.cc'
     # 列表页
-    novel_list_url = site_index + '/75040/'
+    novel_list_url = site_index + '/16279/'
     # 117668
     # 字符集
     novel_site_encoding = 'utf-8'
@@ -116,6 +126,20 @@ class BeqegeCc(Param):
     xpath_chapter_title = '//div[@id="main"]/h1/text()'
     # 内容页: 小说章节内容
     xpath_chapter_content = '//div[@id="main"]/div[2]/div/p/text()'
+    # headers
+    headers = {
+        # "cookie": "SL_G_WPT_TO=eo; SL_GWPT_Show_Hide_tmp=1; SL_wptGlobTipTmp=1; __gads=ID=bfcb8ff05366b808-22848cb49ae4006a:T=1697520476:RT=1709004343:S=ALNI_MZUhxtcq3PQcXjyJc09sQW_VycXmw; __gpi=UID=00000c64f8a5c905:T=1697520476:RT=1709004343:S=ALNI_MZupImck36lbeC1f5aGnndfECvGSg; __eoi=ID=8a4dfb112901d52a:T=1709004036:RT=1709004343:S=AA-AfjYl2Km7_KTEQhsj71oLHorQ; cf_clearance=qp7DthumHoD9I0_UNCZe1z0L2RlGqQvKQR17wiLvAQM-1709004434-1.0-AYtFwayrEpAfLrwjhLpXZd5QcWgAFk2hFZrBPhJwPoHEKxROrzdbFRWvfBYlBByvLtmfp2rNLebNCaVxcZgmi+Q=",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+    }
+    cookie = {
+        "SL_G_WPT_TO": "eo",
+        "SL_GWPT_Show_Hide_tmp": "1",
+        "SL_wptGlobTipTmp": "1",
+        "__gads": "ID=bfcb8ff05366b808-22848cb49ae4006a:T=1697520476:RT=1709004343:S=ALNI_MZUhxtcq3PQcXjyJc09sQW_VycXmw",
+        "__gpi": "UID=00000c64f8a5c905:T=1697520476:RT=1709004343:S=ALNI_MZupImck36lbeC1f5aGnndfECvGSg",
+        "__eoi": "ID=8a4dfb112901d52a:T=1709004036:RT=1709004343:S=AA-AfjYl2Km7_KTEQhsj71oLHorQ",
+        "cf_clearance": "qp7DthumHoD9I0_UNCZe1z0L2RlGqQvKQR17wiLvAQM-1709004434-1.0-AYtFwayrEpAfLrwjhLpXZd5QcWgAFk2hFZrBPhJwPoHEKxROrzdbFRWvfBYlBByvLtmfp2rNLebNCaVxcZgmi+Q=",
+    }
 
 
 class Jingshuzhijia(Param):
@@ -147,3 +171,35 @@ https://jinshuzhijia.com/index.php/book/info/lutoujin
     def get_url(self, url):
         url = url if url.startswith('http') else self.site_index + url
         return url
+
+
+class BiquxsCom(Param):
+    """
+    http://www.biquxs.com/book/1040/
+    """
+    use_proxy = False
+    site_index = "http://www.biquxs.com"
+    # 列表页
+    # https://jinshuzhijia.com/index.php/book/info/chenlunyinyudejiaoqu
+    novel_list_url = site_index + '/book/1040/'
+    # 117668
+    # 字符集
+    novel_site_encoding = 'utf-8'
+    # novel_site_encoding = 'gbk'
+    # 列表页: 小说名称
+    xpath_novel_name = '//meta[@property="og:title"]/@content'
+    # 列表页: 小说作者
+    xpath_novel_author = '//meta[@property="og:book:author"]/@content'
+    # 列表页: 小说章节地址
+    xpath_chapter_url = '//div[@class="listmain"]/dl/dd[position() > 5]/a//@href'
+    # 内容页: 小说章节标题
+    xpath_chapter_title = '//title/text()'
+    # 内容页: 小说章节内容
+    xpath_chapter_content = '//div[@id="content"]/p/text()'
+
+    def get_url(self, url):
+        return self.site_index + url
+
+    def get_chapter_title(self, str):
+        arr = str.split('_')
+        return arr[0]
