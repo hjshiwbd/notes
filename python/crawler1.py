@@ -38,7 +38,6 @@ import traceback
 
 import requests
 import utils
-import brotli
 from bs4 import BeautifulSoup
 import urllib.request
 import urllib3
@@ -50,7 +49,7 @@ logging.basicConfig(level=logging.INFO,
 
 # 69c.org
 # domain = "t66y.com"
-domain = "cl.9202x.xyz"
+domain = "cl.2167x.xyz"
 
 # is_from_local = True
 is_from_local = False
@@ -70,30 +69,13 @@ break_on_count0 = True
 sleep_time = 1
 
 
-def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, proxy=False):
+def get_url(url, **kwargs):
     """
     get请求
     :return:
     """
-
-    def get():
-        if with_cookie:
-            session.cookies = http.cookiejar.LWPCookieJar(cookie_file)
-            session.cookies.load(ignore_expires=True, ignore_discard=True)
-
-        proxies = None
-        if proxy:
-            proxies = {
-                'http': 'http://127.0.0.1:7890'
-            }
-        return session.get(url, params=data, headers=headers, proxies=proxies, timeout=(5, 5))
-
-    if url == "":
-        raise Exception("no url")
-
-    logging.info(f"{url},{data}")
-    session = requests.session()
-    r = get()
+    logging.info(url)
+    r = requests.get(url, **kwargs)
 
     if r.status_code == 403:
         raise Exception("login failed")
@@ -104,28 +86,6 @@ def get_url(url, data=None, with_cookie=False, cookie_file="", headers=None, pro
         raise Exception(m)
 
 
-def get_url2(url):
-    req = urllib.request.Request(url)
-    req.add_header(':authority', domain)
-    req.add_header(':method', 'GET')
-    path = '/' + url.split('/')[-1]
-    req.add_header(':path', path)
-    req.add_header('user-agent',
-                   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36')
-    response = urllib.request.urlopen(req)
-    return response
-
-
-def get_url3(url):
-    http = urllib3.PoolManager()
-    headers = {
-        b':authority': bytes(domain, encoding="utf8"),
-        b'user-agent': b'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-    }
-    r = http.request('GET', url, headers=headers)
-    return r.data.decode('utf-8')
-
-
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
@@ -133,11 +93,11 @@ def from_remote(url):
     # 最后一个"/"后的内容
     path = '/' + url.split('/')[-1]
     header_old = {
-        "authority": domain,
-        "method": "GET",
-        "path": path,
+        # "authority": domain,
+        # "method": "GET",
+        # "path": path,
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "accept-encoding": "gzip, deflate, br",
+        # "accept-encoding": "gzip, deflate, br",
         "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6",
         "sec-ch-ua": '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
         "sec-ch-ua-mobile": "?0",
@@ -156,10 +116,17 @@ def from_remote(url):
         (":method", "GET"),
         (":path", path),
     )
+    proxies = {
+        "http": "http://127.0.0.1:7890",
+        "https": "http://127.0.0.1:7890",
+    }
 
-    r = get_url(url, proxy=False, headers=header_old)
-    # r = get_url2(url)
-    # r = get_url3(url)
+    args = {
+        "headers": header_old,
+        "proxies": proxies
+    }
+
+    r = get_url(url, **args)
 
     r.encoding = 'utf-8'
     return r.text
@@ -180,7 +147,7 @@ def get_page_html(url):
         for i in range(10):
             try:
                 return from_remote(url)
-            except Exception as e:                
+            except Exception as e:
                 logging.info(e)
                 logging.info(f"retry {i} times")
                 time.sleep(5)
