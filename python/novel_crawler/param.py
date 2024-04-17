@@ -181,7 +181,7 @@ class BiquxsCom(Param):
     site_index = "http://www.biquxs.com"
     # 列表页
     # https://jinshuzhijia.com/index.php/book/info/chenlunyinyudejiaoqu
-    novel_list_url = site_index + '/book/1040/'
+    novel_list_url = site_index + '/book/13993/'
     # 117668
     # 字符集
     novel_site_encoding = 'utf-8'

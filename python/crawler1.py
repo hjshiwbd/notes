@@ -49,7 +49,7 @@ logging.basicConfig(level=logging.INFO,
 
 # 69c.org
 # domain = "t66y.com"
-domain = "cl.2167x.xyz"
+domain = "cl.8278x.xyz"
 
 # is_from_local = True
 is_from_local = False
