@@ -58,8 +58,8 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2024-02'
-end = '2024-02'
+start = '2024-03'
+end = '2024-03'
 
 # vehcle_type = {
 #     "car": "1",
