@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .div1 {
+            text-align: center;
+            height: calc(100vh - 60px);
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        /*修改滚动条的样式在ios上不生效*/
+        .div1::-webkit-scrollbar{
+            width: 30px;
+        }
+        .div1::-webkit-scrollbar-thumb {
+            background-color: #555;
+            height: 50px;
+        }
+        .div1::-webkit-scrollbar-track{
+            background-color: #F5F5F5;
+        }
+
+        img {
+            display: block; /* 防止图片之间有间隙 */
+            margin-bottom: -1px; /* 图片之间的间距，可根据需要调整 */
+        }
+
+        .div2 {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 0;
+        }
+        .div2-up {
+            display: flex;
+        }
+        .div2-down {
+            display: flex;
+        }
+
+        .div2 .btn1 {
+            display: flex;
+            height: 20px;
+            width: 44px;
+            background-color: #4CA1CD;
+            color: #fff;
+            margin-right: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div id="imageContainer" class="div1"></div>
+<div class="div2">
+    <div class="div2-up">
+    <a class="btn1" href="javascript:void(0)" onclick="clickfirst()">首</a>
+    <a class="btn1" href="javascript:void(0)" onclick="clickprev()">前</a>
+    <a class="btn1" href="javascript:void(0)" onclick="clicknext()">下</a>
+    <a class="btn1" href="javascript:void(0)" onclick="clicklast()">末</a>
+    <select id="pageSelector" onchange="pageNo = this.value; renderImg()"></select>
+    <select id="pageSizeSelector" onchange="pageSizeChange()"></select>
+    <!--    <select id="pageSizeSelector"></select>-->
+    <span id="currTxt"></span>    
+    </div>
+    <div class="div2-down">
+    <a class="btn1" href="javascript:void(0)" onclick="clickToTop()">顶</a>
+    <a class="btn1" href="javascript:void(0)" onclick="loadNicescroll()">滚</a>
+    </div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js" integrity="sha512-zMfrMAZYAlNClPKjN+JMuslK/B6sPM09BGvrWlW+cymmPmsUT1xJF3P4kxI3lOh9zypakSgWaTpY6vDJY/3Dig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript"
+        src="/%5B%E9%9F%A9%E6%BC%AB%5D2022%E5%B9%B4%E6%96%B0%E6%95%B4%E7%90%86%E5%A4%A7%E5%90%88%E9%9B%86%5B224%E6%9C%AC%5D%5B36.5G%5D/image_count.js"></script>
+<script>
+    // 获取图片容器
+    var container = document.getElementById('imageContainer');
+
+    // 循环创建并添加图片元素
+    var pageNo = 1
+    var pageSizeArr = [50, 100, 200, 300, 400, 500]
+    var pageSize = pageSizeArr[0]
+
+    function getMaxCount() {
+        try {
+            var arr = location.pathname.split("/")
+            var folder = arr[arr.length - 2]
+            // unescape解码
+            var folderName = decodeURIComponent(folder)
+            console.log(folderName)
+            var v = imageCount[folderName] || 8000
+            console.log(`folderName: ${folderName}, imageCount: ${v}`)
+            return v
+        } catch (e) {
+            console.log(e)
+            return 8000
+        }
+    }
+
+    var imgMaxCount = getMaxCount()
+    var maxPageNo = Math.ceil(imgMaxCount / pageSize)
+
+    /**
+     * 渲染分页选择器.select元素, 用1->maxPageNo,步长=1
+     */
+    function renderPageSelector() {
+        var select = document.getElementById('pageSelector')
+        select.innerHTML = ''
+        for (var i = 1; i <= maxPageNo; i++) {
+            var option = document.createElement('option')
+            option.value = i
+            option.innerText = i
+            select.appendChild(option)
+        }
+    }
+
+    /**
+     * 加载&渲染图片
+     */
+    function renderImg() {
+        container.innerHTML = ''
+        var startNo = (pageNo - 1) * pageSize
+        var endNo = Math.min(imgMaxCount - 1, (startNo + pageSize))
+        for (var i = startNo + 1; i <= endNo; i++) {
+            var imageNumber = i.toString().padStart(5, '0');
+            var imageUrl = 'Image' + imageNumber + '.jpg';
+            var img = document.createElement('img');
+            img.src = imageUrl;
+            img.width = 350;
+            container.appendChild(img);
+        }
+
+        // 页面scroll到顶部
+        container.scrollTop = 0
+
+        document.getElementById('pageSelector').value = pageNo
+        document.getElementById('currTxt').innerText = '当前页：' + pageNo + ' / ' + maxPageNo
+    }
+
+    // 每页显示图片数量的选择器,select元素
+    function renderPageSizeSelector() {
+        var select = document.getElementById('pageSizeSelector')
+        for (var i = 0; i < pageSizeArr.length; i++) {
+            var option = document.createElement('option')
+            option.value = pageSizeArr[i]
+            option.innerText = pageSizeArr[i]
+            select.appendChild(option)
+        }
+    }
+
+
+    window.onload = function () {
+        renderPageSelector()
+        renderImg()
+        renderPageSizeSelector()
+    }
+
+    function clickfirst() {
+        pageNo = 1
+        renderImg()
+    }
+
+    function clicklast() {
+        pageNo = maxPageNo
+        renderImg()
+    }
+
+    function clickprev() {
+        pageNo--
+        if (pageNo > 0) {
+            renderImg()
+        }
+    }
+
+    function clicknext() {
+        pageNo++
+        if (pageNo <= maxPageNo) {
+            renderImg()
+        }
+    }
+
+    // 点击按钮，回到顶部
+    function clickToTop() {
+        container.scrollTop = 0
+    }
+
+    function pageSizeChange() {
+        pageSize = document.getElementById('pageSizeSelector').value
+        pageNo = 1
+        maxPageNo = Math.ceil(imgMaxCount / pageSize)
+        renderPageSelector()
+        renderImg()
+    }
+
+    // 加载滚动条
+    function loadNicescroll() {
+        $(".div1").niceScroll({
+            cursoropacitymin: 1, // change opacity when cursor is inactive (scrollabar "hidden" state), range from 1 to 0
+            cursoropacitymax: 1, // change opacity when cursor is active (scrollabar "visible" state), range from 1 to 0
+            cursorwidth: "30px", // cursor width in pixel (you can also write "5px")
+            cursorminheight: 50, // set the minimum cursor height (pixel)
+            scrollspeed: 1, // speed of selection when dragged with cursor
+            cursordragontouch:true,
+            cursorfixedheight: false, // set fixed height for cursor in pixel
+        });
+    }
+
+</script>
+</body>
+</html>
