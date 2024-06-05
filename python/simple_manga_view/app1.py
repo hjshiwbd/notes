@@ -20,6 +20,7 @@ import os
 import sys
 import json
 
+base_index = r'D:\!fin\韩漫\~index.html'
 
 def is_has_index(file_list):
     has_index = False
@@ -47,7 +48,7 @@ def gen_mklink_script():
                 continue
 
             s = f"""
-    mklink /h "{parent_folder}\\~index.html" "g:\\!fin-e\\[韩漫]2022年新整理大合集[224本][36.5g]\\~index.html"
+    mklink /h "{parent_folder}\\~index.html" "{base_index}"
     """.strip()
             print(s)
 
