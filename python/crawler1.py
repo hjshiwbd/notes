@@ -117,8 +117,8 @@ def from_remote(url):
         (":path", path),
     )
     proxies = {
-        "http": "http://127.0.0.1:7890",
-        "https": "http://127.0.0.1:7890",
+        "http": "http://127.0.0.1:7897",
+        "https": "http://127.0.0.1:7897",
     }
 
     args = {
