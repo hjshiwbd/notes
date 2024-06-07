@@ -18,14 +18,16 @@
         }
 
         /*修改滚动条的样式在ios上不生效*/
-        .div1::-webkit-scrollbar{
+        .div1::-webkit-scrollbar {
             width: 30px;
         }
+
         .div1::-webkit-scrollbar-thumb {
             background-color: #555;
             height: 50px;
         }
-        .div1::-webkit-scrollbar-track{
+
+        .div1::-webkit-scrollbar-track {
             background-color: #F5F5F5;
         }
 
@@ -41,9 +43,11 @@
             background-color: #fff;
             padding: 10px 0;
         }
+
         .div2-up {
             display: flex;
         }
+
         .div2-down {
             display: flex;
         }
@@ -64,22 +68,24 @@
 <div id="imageContainer" class="div1"></div>
 <div class="div2">
     <div class="div2-up">
-    <a class="btn1" href="javascript:void(0)" onclick="clickfirst()">首</a>
-    <a class="btn1" href="javascript:void(0)" onclick="clickprev()">前</a>
-    <a class="btn1" href="javascript:void(0)" onclick="clicknext()">下</a>
-    <a class="btn1" href="javascript:void(0)" onclick="clicklast()">末</a>
-    <select id="pageSelector" onchange="pageNo = this.value; renderImg()"></select>
-    <select id="pageSizeSelector" onchange="pageSizeChange()"></select>
-    <!--    <select id="pageSizeSelector"></select>-->
-    <span id="currTxt"></span>    
+        <a class="btn1" href="javascript:void(0)" onclick="clickfirst()">首</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clickprev()">前</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clicknext()">下</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clicklast()">末</a>
+        <select id="pageSelector" onchange="pageNo = this.value; renderImg()"></select>
+        <select id="pageSizeSelector" onchange="pageSizeChange()"></select>
+        <!--    <select id="pageSizeSelector"></select>-->
+        <span id="currTxt"></span>
     </div>
     <div class="div2-down">
-    <a class="btn1" href="javascript:void(0)" onclick="clickToTop()">顶</a>
-    <a class="btn1" href="javascript:void(0)" onclick="loadNicescroll()">滚</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clickToTop()">顶</a>
+        <a class="btn1" href="javascript:void(0)" onclick="loadNicescroll()">滚</a>
     </div>
 </div>
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js" integrity="sha512-zMfrMAZYAlNClPKjN+JMuslK/B6sPM09BGvrWlW+cymmPmsUT1xJF3P4kxI3lOh9zypakSgWaTpY6vDJY/3Dig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js"
+        integrity="sha512-zMfrMAZYAlNClPKjN+JMuslK/B6sPM09BGvrWlW+cymmPmsUT1xJF3P4kxI3lOh9zypakSgWaTpY6vDJY/3Dig=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript"
         src="/%5B%E9%9F%A9%E6%BC%AB%5D2022%E5%B9%B4%E6%96%B0%E6%95%B4%E7%90%86%E5%A4%A7%E5%90%88%E9%9B%86%5B224%E6%9C%AC%5D%5B36.5G%5D/image_count.js"></script>
 <script>
@@ -160,9 +166,32 @@
 
 
     window.onload = function () {
+        // 渲染分页选择器
         renderPageSelector()
+        // 渲染图片
         renderImg()
+        // 每页显示图片数量的选择器,select元素
         renderPageSizeSelector()
+        // 键盘翻页事件
+        attachPageEvent()
+    }
+
+    function attachPageEvent() {
+        document.onkeydown = function (e) {
+            console.log(e)
+            switch (e.code) {
+                // 左键向前翻页
+                case 'ArrowLeft': {
+                    clickprev()
+                    break;
+                }
+                // 右键向后翻页
+                case 'ArrowRight': {
+                    clicknext()
+                    break;
+                }
+            }
+        }
     }
 
     function clickfirst() {
@@ -210,7 +239,7 @@
             cursorwidth: "30px", // cursor width in pixel (you can also write "5px")
             cursorminheight: 50, // set the minimum cursor height (pixel)
             scrollspeed: 1, // speed of selection when dragged with cursor
-            cursordragontouch:true,
+            cursordragontouch: true,
             cursorfixedheight: false, // set fixed height for cursor in pixel
         });
     }
