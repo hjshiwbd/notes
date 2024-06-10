@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display</title>
+    {% include 'include_css.html' %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .div1 {
+            text-align: center;
+            height: calc(100vh - 60px);
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        /*修改滚动条的样式在ios上不生效*/
+        .div1::-webkit-scrollbar {
+            width: 30px;
+        }
+
+        .div1::-webkit-scrollbar-thumb {
+            background-color: #555;
+            height: 50px;
+        }
+
+        .div1::-webkit-scrollbar-track {
+            background-color: #F5F5F5;
+        }
+
+        img {
+            display: block; /* 防止图片之间有间隙 */
+            margin-bottom: -1px; /* 图片之间的间距，可根据需要调整 */
+        }
+
+        .div2 {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 0;
+        }
+
+        .div2-up {
+            display: flex;
+        }
+
+        .div2-down {
+            display: flex;
+        }
+
+        .div2 .btn1 {
+            display: flex;
+            height: 20px;
+            width: 44px;
+            background-color: #4CA1CD;
+            color: #fff;
+            margin-right: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div id="imageContainer" class="div1"></div>
+<div class="div2">
+    <div class="div2-up">
+        <a class="btn1" href="javascript:void(0)" onclick="clickfirst()">首</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clickprev()">前</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clicknext()">下</a>
+        <a class="btn1" href="javascript:void(0)" onclick="clicklast()">末</a>
+        <select id="pageSelector" onchange="pageNo = this.value; renderImg()"></select>
+        <select id="pageSizeSelector" onchange="pageSizeChange()"></select>
+        <!--    <select id="pageSizeSelector"></select>-->
+        <span id="currTxt"></span>
+    </div>
+    <div class="div2-down">
+        <a class="btn1" href="javascript:void(0)" onclick="clickToTop()">顶</a>
+        <a class="btn1" href="/">home</a>
+    </div>
+</div>
+</body>
+{% include 'include_js.html' %}
+<script src="/static/js/project/view.js"></script>
+</html>
