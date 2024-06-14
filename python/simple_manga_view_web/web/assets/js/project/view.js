@@ -11,49 +11,41 @@ var imgMaxCount = 99999
 // 最大页数
 var maxPageNo = 200
 
+var isImgLazy = getImgLazy()
+
 // 获取图片父路径
 var imgParentPath = ''
-$(async function () {
-    var query = parseQuery(location.search)
-    var info = await xhr({
-        url: '/api/mangaDetail',
-        data: {path: query.path}
-    })
-    onMaxCountChange(info.total)
-    imgParentPath = info.imgParentPath
 
-    // 渲染分页选择器
-    renderPageSelector()
-    // 渲染图片
-    renderImg()
-    // 每页显示图片数量的选择器,select元素
-    renderPageSizeSelector()
-    // 键盘翻页事件
-    attachPageEvent()
-})
+function onLoad() {
+    $(async function () {
+        var query = parseQuery(location.search)
+        var info = await xhr({
+            url: '/api/mangaDetail',
+            data: {path: query.path}
+        })
+        onMaxCountChange(info.total)
+        imgParentPath = info.imgParentPath
+
+        // 渲染分页选择器
+        renderPageSelector()
+        // 渲染图片
+        renderImg()
+        // 每页显示图片数量的选择器,select元素
+        renderPageSizeSelector()
+        // 键盘翻页事件
+        attachPageEvent()
+        // 懒加载开关文字
+        renderLazySwitch()
+        // 图片懒加载, 加载首屏的图片
+        loadLazyImages()
+    })
+}
 
 function onMaxCountChange(total) {
 // 图片总数
     imgMaxCount = total || 99999
 // 最大页数
     maxPageNo = Math.ceil(imgMaxCount / pageSize)
-}
-
-
-function getMaxCount() {
-    try {
-        var arr = location.pathname.split("/")
-        var folder = arr[arr.length - 2]
-        // unescape解码
-        var folderName = decodeURIComponent(folder)
-        console.log(folderName)
-        var v = imageCount[folderName] || 8000
-        console.log(`folderName: ${folderName}, imageCount: ${v}`)
-        return v
-    } catch (e) {
-        console.log(e)
-        return 8000
-    }
 }
 
 /**
@@ -70,6 +62,18 @@ function renderPageSelector() {
     }
 }
 
+
+// 检查元素是否在视口中
+function isInViewport(element) {
+    var rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
+
 /**
  * 加载&渲染图片
  */
@@ -80,9 +84,17 @@ function renderImg() {
     for (var i = startNo + 1; i <= endNo; i++) {
         var imageNumber = i.toString().padStart(5, '0');
         var imageUrl = `/imgs/${imgParentPath}/Image${imageNumber}.jpg`
+
         var img = document.createElement('img');
-        img.src = imageUrl;
         img.width = 350;
+        if (isImgLazy) {
+            img.src = '/static/img/blank.png';
+            img.className = 'lazy'
+            img.setAttribute('data-src', imageUrl)
+        } else {
+            img.src = imageUrl;
+        }
+
         container.appendChild(img);
     }
 
@@ -92,6 +104,27 @@ function renderImg() {
     document.getElementById('pageSelector').value = pageNo
     document.getElementById('currTxt').innerText = '当前页：' + pageNo + ' / ' + maxPageNo
 }
+
+function loadLazyImages() {
+    if (!isImgLazy) {
+        // 懒加载关闭
+        return
+    }
+    // 获取所有需要懒加载的图片
+    var lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+    lazyImages.forEach(function (img) {
+        if (isInViewport(img)) {
+            img.src = img.dataset.src;
+            img.classList.remove('lazy'); // 可选：移除lazy类以进行样式更改或性能优化
+        }
+    });
+}
+
+// jquery监听页面滚动事件
+$('#imageContainer').scroll(function () {
+    loadLazyImages();
+});
+
 
 // 每页显示图片数量的选择器,select元素
 function renderPageSizeSelector() {
@@ -107,7 +140,6 @@ function renderPageSizeSelector() {
 
 function attachPageEvent() {
     document.onkeydown = function (e) {
-        console.log(e)
         switch (e.code) {
             // 左键向前翻页
             case 'ArrowLeft': {
@@ -142,7 +174,7 @@ function clickprev() {
 
 function clicknext() {
     pageNo++
-    if (pageNo <= maxPageNo) {
+    if (pageNo < maxPageNo) {
         renderImg()
     }
 }
@@ -154,21 +186,29 @@ function clickToTop() {
 
 function pageSizeChange() {
     pageSize = document.getElementById('pageSizeSelector').value
+    pageSize = parseInt(pageSize, 10)
     pageNo = 1
     maxPageNo = Math.ceil(imgMaxCount / pageSize)
     renderPageSelector()
     renderImg()
 }
 
-// 加载滚动条
-function loadNicescroll() {
-    $(".div1").niceScroll({
-        cursoropacitymin: 1, // change opacity when cursor is inactive (scrollabar "hidden" state), range from 1 to 0
-        cursoropacitymax: 1, // change opacity when cursor is active (scrollabar "visible" state), range from 1 to 0
-        cursorwidth: "30px", // cursor width in pixel (you can also write "5px")
-        cursorminheight: 50, // set the minimum cursor height (pixel)
-        scrollspeed: 1, // speed of selection when dragged with cursor
-        cursordragontouch: true,
-        cursorfixedheight: false, // set fixed height for cursor in pixel
-    });
+// 懒加载开关文字
+function renderLazySwitch() {
+    var lazySwitch = document.getElementById('imgLazySwitch')
+    if (isImgLazy == true) {
+        lazySwitch.innerText = '懒开'
+    } else {
+        lazySwitch.innerText = '懒关'
+    }
 }
+
+// 懒加载打开关闭
+function onImgLazySwichClick() {
+    isImgLazy = !isImgLazy
+    setImgLazy(isImgLazy)
+    location.reload()
+}
+
+// 页面初始化
+onLoad()

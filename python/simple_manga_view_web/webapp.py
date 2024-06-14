@@ -42,7 +42,7 @@ def get_all_folders():
     """
     列出满足条件的文件夹
     """
-    return mangaservice.get_all_folders()
+    return mangaservice.get_all_folders(run_path)
 
 
 @app.route('/api/mangaDetail', methods=['POST'])

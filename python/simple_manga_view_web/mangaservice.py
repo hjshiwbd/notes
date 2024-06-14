@@ -6,17 +6,16 @@ from flask import jsonify, request
 import tools
 from resp import Response
 
-folder_root = r'G:\!fin-e\[韩漫]2022年新整理大合集[224本][36.5G]\resources'
 
-
-def get_all_folders():
+def get_all_folders(run_path):
     """
     所有2级目录,即漫画目录
     """
     folders = []
-    for root, dirs, files in os.walk(folder_root):
+    resources_root = os.path.join(run_path, 'resources')
+    for root, dirs, files in os.walk(resources_root):
         # 当前路径相对root的层级
-        level = root.count(os.sep) - folder_root.count(os.sep)
+        level = root.count(os.sep) - resources_root.count(os.sep)
         # logging.info('{}|{}'.format('-' * 4 * level, root))
         if level == 2:
             obj = {
