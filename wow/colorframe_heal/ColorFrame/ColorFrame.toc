@@ -1,0 +1,8 @@
+## Interface: 30403
+## Title: ColorFrame
+## Notes: ColorFrame
+## Author: hjin
+## Version: 1.0.0
+## SavedVariables: ColorFrame
+
+ColorFrame.lua
