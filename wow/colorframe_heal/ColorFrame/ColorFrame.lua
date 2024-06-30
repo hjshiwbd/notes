@@ -135,7 +135,7 @@ end
 
 function setColor()
     if not IsInGroup() and not IsInRaid() then
-        print('not in group or raid')
+        --print('not in group or raid')
         return
     end
     local groupNum = GetNumGroupMembers()
@@ -146,6 +146,7 @@ function setColor()
     local playerhealth = UnitHealth("player")
     local playermaxhealth = UnitHealthMax("player")
     local playerpercent = playerhealth / playermaxhealth
+    --用insert控制数组自增, 不能用[x]的方式, 会丢失自增
     table.insert(allhealth, allhealthi, {
         key = 'player',
         name = playername,
@@ -160,20 +161,43 @@ function setColor()
         local maxHealth = UnitHealthMax(unit)
         local percent = health / maxHealth
 
-        table.insert(allhealth, allhealthi, {
-            key = unit,
-            name = name,
-            percent = percent
-        })
-        allhealthi = allhealthi + 1
+        -- 没有死亡
+        if not UnitIsDead(unit) then
+            table.insert(allhealth, allhealthi, {
+                key = unit,
+                name = name,
+                percent = percent
+            })
+            allhealthi = allhealthi + 1
+        end
     end
 
-    -- 根据allhealth里的percent排序, 得到k
-    table.sort(allhealth, function(a, b)
-        return a.percent <= b.percent
-    end)
+    --for k, v in pairs(allhealth) do
+    --    print(k, v.key, v.name, v.percent)
+    --end
 
-    local minHealthKey = allhealth[1].key
+    local not_heal = true
+    for k, v in pairs(allhealth) do
+        if v.percent < 0.9 then
+            not_heal = false
+            break
+        end
+    end
+
+    if not_heal then
+        print('notheal')
+        frame.texture:SetColorTexture(0, 0, 0, 1)
+        return
+    end
+
+    local minHealth = { percent = 1 }
+    for k, v in pairs(allhealth) do
+        if v.percent < minHealth.percent then
+            minHealth = v
+        end
+    end
+
+    local minHealthKey = minHealth.key
     --print(minHealthKey, allhealth[1].name)
     local r = colortable[minHealthKey][1]
     local g = colortable[minHealthKey][2]
