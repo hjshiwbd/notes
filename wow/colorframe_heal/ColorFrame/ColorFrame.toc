@@ -3,6 +3,7 @@
 ## Notes: ColorFrame
 ## Author: hjin
 ## Version: 1.0.0
-## SavedVariables: ColorFrame
+## SavedVariables: ColorFrameConfig
 
+Util.lua
 ColorFrame.lua

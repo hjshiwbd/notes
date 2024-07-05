@@ -50,6 +50,14 @@
 颜色49, 十进制(255, 235, 205), 十六进制(FFEBED)
 颜色50, 十进制(70, 130, 180), 十六进制(4682B4)
 ]]
+
+-- 引用Util.lua
+local Util = Util or {}
+
+-- ColorFrameConfig来自savevariables
+ColorFrameConfig = nil
+
+
 -- 定义颜色对应表
 local colortable = {
     player = { 228, 142, 76 },
@@ -59,16 +67,23 @@ local colortable = {
     party4 = { 240, 128, 128 },
 }
 
-
 -- 创建主框体
-local frame = CreateFrame("Frame", "ColorFrame", UIParent, "BackdropTemplate")
-frame:SetSize(160, 50)  -- 设置框体大小
-frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 235, -25)  -- 设置框体初始位置为(200, -200) 相对左上角
-
+local colorFrame = CreateFrame("Frame", "ColorFrame", UIParent, "BackdropTemplate")
+colorFrame:SetSize(160, 50) -- 设置框体大小
 -- 设置框体背景为实心颜色
-frame.texture = frame:CreateTexture(nil, "BACKGROUND")
-frame.texture:SetAllPoints(true)
-frame.texture:SetColorTexture(0, 0, 0, 1)  -- 实心黑色背景
+colorFrame.texture = colorFrame:CreateTexture(nil, "BACKGROUND")
+colorFrame.texture:SetAllPoints(true)
+colorFrame.texture:SetColorTexture(0, 0, 0, 1) -- 实心黑色背景
+-- 使框体可拖动
+colorFrame:SetMovable(true)
+colorFrame:EnableMouse(true)
+colorFrame:RegisterForDrag("LeftButton")
+colorFrame:SetScript("OnDragStart", function(self)
+    self:StartMoving()
+end)
+colorFrame:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+end)
 
 -- 创建显示文本
 --local text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -76,22 +91,16 @@ frame.texture:SetColorTexture(0, 0, 0, 1)  -- 实心黑色背景
 --text:SetTextColor(1, 1, 1)  -- 设置文本颜色为白色 (RGB: 1, 1, 1)
 
 -- 注册事件以在玩家登录后立即显示框体
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function(self, event, ...)
+colorFrame:RegisterEvent("PLAYER_LOGIN")
+colorFrame:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
-        frame:Show()
-    end
-end)
+        -- 颜色框体初始化显示
+        ColorFrameConfig = ColorFrameConfig or getDefaultConfig()
+        setColorFramePosition()
+        colorFrame:Show()
 
--- 使框体可拖动
-frame:SetMovable(true)
-frame:EnableMouse(true)
-frame:RegisterForDrag("LeftButton")
-frame:SetScript("OnDragStart", function(self)
-    self:StartMoving()
-end)
-frame:SetScript("OnDragStop", function(self)
-    self:StopMovingOrSizing()
+        init()
+    end
 end)
 
 --注册命令行/cfset
@@ -102,7 +111,7 @@ SlashCmdList["CFSET"] = function(args)
     print(r, g, b)
     if r and g and b then
         print('enter')
-        frame.texture:SetColorTexture(r / 255, g / 255, b / 255, 1)
+        colorFrame.texture:SetColorTexture(r / 255, g / 255, b / 255, 1)
     else
         print("Usage: /cfset <r> <g> <b>")
     end
@@ -133,6 +142,18 @@ SlashCmdList["CFOFF"] = function(args)
     end
 end
 
+-- 创建一个框架用于监听事件
+local frame2 = CreateFrame("Frame")
+
+-- 注册需要的事件
+frame2:RegisterEvent("UNIT_HEALTH")
+frame2:RegisterEvent("UNIT_HEALTH_FREQUENT")
+-- 事件处理函数
+frame2:SetScript("OnEvent", function(self, event, arg1)
+    setColor()
+end)
+
+-- 根据队伍中人员的hp情况, 来设置面板颜色. 把小队5个人的生命值组织起来, 然后根据hp排序
 function setColor()
     if not IsInGroup() and not IsInRaid() then
         --print('not in group or raid')
@@ -154,6 +175,7 @@ function setColor()
     })
     allhealthi = allhealthi + 1
 
+    -- 自己不是partyX是player, 所以-1
     for i = 1, groupNum - 1 do
         local unit = "party" .. i
         local name = UnitName(unit)
@@ -176,9 +198,10 @@ function setColor()
     --    print(k, v.key, v.name, v.percent)
     --end
 
+    -- 不需要治疗
     local not_heal = true
     for k, v in pairs(allhealth) do
-        if v.percent < 0.9 then
+        if v.percent < 0.85 then
             not_heal = false
             break
         end
@@ -186,7 +209,7 @@ function setColor()
 
     if not_heal then
         print('notheal')
-        frame.texture:SetColorTexture(0, 0, 0, 1)
+        colorFrame.texture:SetColorTexture(0, 0, 0, 1)
         return
     end
 
@@ -204,6 +227,55 @@ function setColor()
     local b = colortable[minHealthKey][3]
     --print('rgb=', r, g, b)
 
-    frame.texture:SetColorTexture(r / 255, g / 255, b / 255, 1)
+    colorFrame.texture:SetColorTexture(r / 255, g / 255, b / 255, 1)
+end
 
+-- esc设置里, 界面的y轴定位
+positionY = 0
+
+---- 创建一个简单的复选框
+--local myCheckbox = Util.newCheckbox("test1", "test2", function(self, value)
+--    if value then
+--        print("插件功能已启用")
+--        -- 启用功能的代码
+--    else
+--        print("插件功能已禁用")
+--        -- 禁用功能的代码
+--    end
+--end)
+-- positionY = positionY - 40
+--myCheckbox:SetPoint("TOPLEFT", 16, positionY - 40)
+
+-- 插件初始化
+function init()
+    initPositionEditbox()
+end
+
+-- 初始化坐标位置输入框
+function initPositionEditbox()
+    local positionEditBox = Util.newEditBox("颜色框坐标位置(逗号分隔)", function(self, value)
+        -- value用逗号分割
+        local a, b = value:match("([^,]+),([^,]+)")
+        ColorFrameConfig.position = {}
+        ColorFrameConfig.position.x = tonumber(a)
+        ColorFrameConfig.position.y = tonumber(b)
+        setColorFramePosition()
+    end)
+    positionY = positionY - 60
+    positionEditBox:SetPoint("TOPLEFT", 16, positionY)
+    positionEditBox:SetText(ColorFrameConfig.position.x .. "," .. ColorFrameConfig.position.y)
+end
+
+-- 设置颜色框体位置
+function setColorFramePosition()
+    colorFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ColorFrameConfig.position.x, ColorFrameConfig.position.y) -- 设置框体初始位置为(200, -200) 相对左上角
+end
+
+function getDefaultConfig()
+    return {
+        position = {
+            x = 235,
+            y = -25
+        }
+    }
 end
