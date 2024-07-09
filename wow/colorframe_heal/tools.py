@@ -3,6 +3,8 @@ import logging
 import os
 import re
 from logging.handlers import TimedRotatingFileHandler
+import traceback
+import PyQt6.QtWidgets as qw
 
 
 def setup_logger(log_name, log_path=sys.path[0]):
