@@ -1,5 +1,7 @@
 # coding:utf-8
 """
+使用了无头浏览器, 需要有访问Google的能力才能运行本程序
+
 CREATE TABLE `vehicle_sales_pcauto` (
   `id` bigint(20) NOT NULL,
   `data_date` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日期',
@@ -30,11 +32,14 @@ pip install html5lib
 pip install python-dateutil
 """
 
+import os
 import datetime
 import json
 import subprocess
 import time
 import logging
+
+import requests
 import utils
 from bs4 import BeautifulSoup
 import snowflake.client
@@ -43,6 +48,11 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from lxml import etree
 import re
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+# from selenium.webdriver.firefox.options import Options as FireFoxOptions
+from selenium.webdriver.firefox.service import Service
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s.%(msecs)03d|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
@@ -74,8 +84,63 @@ vtype = ['1', '2', '3']
 from_local = False
 snowflake_port = 8910
 
-# Set
-all_type = set()
+"""
+能源可能类型
+1 汽油
+2 柴油
+3 油电混动
+4 插电混动
+5 纯电动
+6 增程式
+7 氢燃料电池
+"""
+ice_types = ['汽油', '柴油', '油电混动']
+ev_types = ['插电混动', '纯电动', '增程式']
+fcev_types = ['氢燃料电池']
+
+# Chromedirver 禁用下载提示
+os.environ['CHROME_DRIVER_DISABLE_DOWNLOAD_PROMPT'] = '1'
+
+web_driver = None
+
+options = ChromeOptions()
+options.add_argument('--proxy-server=127.0.0.1:7897')  # proxy
+options.add_argument('--headless')  # 无头模式
+options.add_argument('--disable-gpu')  # 如果没有显卡支持，添加此参数
+options.add_argument('--no-sandbox')  # Bypass OS security model
+options.add_argument('--disable-dev-shm-usage')  # overcome limited resource problems
+
+# Chrome
+web_driver = webdriver.Chrome(options=options)
+
+
+def get_url_headless(url):
+    """
+    url是脚本处理过的, 用无头浏览器来获取信息
+    """
+    # 设置选项
+
+    # Chrome
+    logging.info(f"loading {url}")
+
+    # firefox
+    # "D:\\browser_dirvers\\geckodriver.exe"
+    # capabilities2 = webdriver.DesiredCapabilities.FIREFOX
+    # service = Service(executable_path="D:\\browser_dirvers\\geckodriver.exe")
+    # driver = webdriver.Firefox(options=options)
+
+    try:
+        # 加载网页
+        web_driver.get(url)
+
+        # 等待页面完全加载
+        web_driver.implicitly_wait(10)  # seconds
+
+        # 获取渲染后的HTML
+        return web_driver.page_source
+    except Exception as e:
+        logging.error(f"{url} error: {e}")
+        raise e
 
 
 def get_html(vehicle_type, data_year, data_month):
@@ -155,7 +220,7 @@ def get_energy_type(td_arr):
         elif '电动' in v:
             is_ev = '1'
         elif re.match(r'^\d+\.\d+[TLtl]$', v):
-            # v满足正则 1.0T 或者 1.0L
+            # ice=内燃机, v满足正则 1.0T 或者 1.0L
             is_ice = '1'
     # print(types)
     # all_type.update(types)
@@ -168,7 +233,70 @@ def get_energy_type(td_arr):
     }
 
 
+def get_energy_type2(td_arr):
+    """
+    换个源头来获取能源类型, 老方法get_energy_type()获取的不准
+    :param td_arr:
+    :return:
+    """
+
+    def get_engery_types(url):
+        """
+        获取配置页面里的所有能源类型,剔重
+        :param url:
+        :return: 剔重set
+        """
+        # 获取渲染后的HTML
+        rendered_html = get_url_headless(url)
+        # energy-type-item-container
+        html = etree.HTML(rendered_html, etree.HTMLParser(encoding='utf-8'))
+        # 排量
+        types = html.xpath('//div[@class="energy-type-item-container"]/span/text()')
+        div_text = html.xpath('//div[@class="js-table-row table-row"]/div[0][text()="发动机"]')
+
+        # types 是array 要剔重
+        return {"energy_type": set(types)}
+
+    # https://price.pcauto.com.cn/sg27043/config.html
+    td = td_arr[1]
+    # /salescar/sg27043/ -> /sg27043/
+    url = f'{site_domain}{td.a["href"].replace("/salescar", "")}config.html'
+
+    rr = get_engery_types(url)
+    types = rr["energy_type"]
+
+    # types和各类型的交集
+    joinice = arr_join(types, ice_types)
+    joinev = arr_join(types, ev_types)
+    joinfcev = arr_join(types, fcev_types)
+    is_ice = '1' if len(joinice) > 0 else '0'
+    is_ev = '1' if len(joinev) > 0 else '0'
+    is_fcev = '1' if len(joinfcev) > 0 else '0'
+
+    return {
+        "is_ev": is_ev,
+        "is_ice": is_ice,
+        "is_fcev": is_fcev,
+        "url": url,
+        "displacement": ''
+    }
+
+
+def arr_join(arr1, arr2):
+    """
+    2个数组求交集
+    :return:
+    """
+    return list(set(arr1) & set(arr2))
+
+
 def handle_one_month(vehicle_type, date):
+    """
+    处理一个月的数据
+    :param vehicle_type:
+    :param date:
+    :return:
+    """
     html = get_html(vehicle_type, date.year, date.month)
     # print(html)
     # return
@@ -181,6 +309,7 @@ def handle_one_month(vehicle_type, date):
     for tr in trs:
         n = n + 1
         if n > 10000:
+            # 提前停止, 测试用
             break
         td_arr = tr.select('td')
         if len(td_arr) == 0:
@@ -193,7 +322,7 @@ def handle_one_month(vehicle_type, date):
         brand_lv2 = td_arr[1].text
         price_min, price_max = get_price(td_arr[2].text)
         sales_num = td_arr[4].text
-        energy_type = get_energy_type(td_arr)
+        energy_type = get_energy_type2(td_arr)
         is_ev = energy_type['is_ev']
         is_ice = energy_type['is_ice']
         is_fcev = energy_type['is_fcev']
@@ -238,10 +367,11 @@ def run():
 
         if d2 > end:
             break
+
+    web_driver.quit()
+
     logging.info("finish")
-    # 程序不会真的停止,因为cmd开启了一个服务
-    global popen
-    popen.terminate()
+    # 程序不会真的停止,因为cmd开启了一个服务, 需要关闭 subprocess.Popen
 
 
 def idserver():
