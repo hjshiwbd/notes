@@ -55,7 +55,7 @@ function runFor(config, configParam) {
 
   // 把新代理组,加到手动选择中以供使用
   var proxy = config['proxy-groups'].find(o => o.name == configParam.baseGroup)
-  proxy.proxies.push(configParam.destGroup)
+  proxy.proxies.unshift(configParam.destGroup)
 
 }
 
