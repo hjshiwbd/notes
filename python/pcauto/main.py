@@ -2,6 +2,33 @@
 """
 使用了无头浏览器, 需要有访问Google的能力才能运行本程序
 
+CREATE TABLE `vehicle_info` (
+  `id` bigint(20) NOT NULL,
+  `code` varchar(32) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'pcauto网站的唯一编码',
+  `brand_lv1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '一级品牌',
+  `brand_lv2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '二级品牌',
+  `price_min` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '最低价',
+  `price_max` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '最高价',
+  `vehicle_type` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '1car,2suv,3mpv',
+  `length` int(11) NOT NULL DEFAULT '-1' COMMENT '长mm',
+  `width` int(11) NOT NULL DEFAULT '-1' COMMENT '宽mm',
+  `height` int(11) NOT NULL DEFAULT '-1' COMMENT '高mm',
+  `wheelbase` int(11) NOT NULL DEFAULT '-1' COMMENT '轴距mm',
+  `gate_count` int(11) NOT NULL DEFAULT '-1' COMMENT '车门数',
+  `seat_count` int(11) NOT NULL DEFAULT '-1' COMMENT '座位数',
+  `energy_type` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '能源类型',
+  `weight` int(11) NOT NULL DEFAULT '-1' COMMENT '车身重量kg',
+  `displacement` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '排量',
+  `inlet` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '进气形式',
+  `engine_power` varchar(100) COLLATE utf8mb4_bin NOT NULL DEFAULT '-1' COMMENT '发动机功率',
+  `motor_power` varchar(100) COLLATE utf8mb4_bin NOT NULL DEFAULT '-1' COMMENT '电动机功率',
+  `sales_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '详情url',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='车辆基本信息';
+
 CREATE TABLE `vehicle_sales_pcauto` (
   `id` bigint(20) NOT NULL,
   `data_date` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '日期',
@@ -15,15 +42,15 @@ CREATE TABLE `vehicle_sales_pcauto` (
   `sales_num` int(10) DEFAULT NULL COMMENT '销量',
   `vehicle_type` varchar(2) DEFAULT NULL COMMENT '1car,2suv',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `sales_url` varchar(255) DEFAULT NULL COMMENT '销量详情url',
+  `is_ev` varchar(1) DEFAULT NULL COMMENT '是否有电动款',
+  `is_ice` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '是否汽油款,ice内燃机',
+  `is_fcev` varchar(1) DEFAULT NULL COMMENT '是否有氢燃料电池',
+  `displacement` varchar(100) DEFAULT NULL COMMENT '排量',
+  `vehicle_id` bigint(20) DEFAULT NULL COMMENT 'vehicle_info的id',
+  `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'pcauto网站的车型唯一值',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- 231007加字段
-alter table vehicle_sales_pcauto add sales_url varchar(255) comment '销量详情url';
-alter table vehicle_sales_pcauto add is_ev varchar(1) comment '是否有电动款';
-alter table vehicle_sales_pcauto add is_ice varchar(1) comment '是否有汽油款,ice内燃机';
-alter table vehicle_sales_pcauto add is_fcev varchar(1) comment '是否有氢燃料电池';
-alter table vehicle_sales_pcauto add displacement varchar(100) comment '排量';
 
 pip:
 pip install pysnowflake
@@ -39,6 +66,7 @@ import subprocess
 import time
 import logging
 
+import dbutils
 import requests
 import utils
 from bs4 import BeautifulSoup
@@ -68,8 +96,8 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2024-07'
-end = '2024-07'
+start = '2024-08'
+end = '2024-08'
 
 # vehcle_type = {
 #     "car": "1",
@@ -101,8 +129,6 @@ fcev_types = ['氢燃料电池']
 # Chromedirver 禁用下载提示
 os.environ['CHROME_DRIVER_DISABLE_DOWNLOAD_PROMPT'] = '1'
 
-web_driver = None
-
 options = ChromeOptions()
 options.add_argument('--proxy-server=127.0.0.1:7897')  # proxy
 options.add_argument('--headless')  # 无头模式
@@ -112,6 +138,9 @@ options.add_argument('--disable-dev-shm-usage')  # overcome limited resource pro
 
 # Chrome
 web_driver = webdriver.Chrome(options=options)
+
+# vehcile_info更新周期,天
+vehcile_info_update_interval = 180
 
 
 def get_url_headless(url):
@@ -171,11 +200,11 @@ def save_db(data_arr):
     with utils.connect(mysql_host, mysql_port, mysql_user, mysql_pass) as conn:
         sql = "insert into test.vehicle_sales_pcauto (id, data_date, data_year, data_month, `rank`, brand_lv1, " \
               "brand_lv2, price_min, price_max, sales_num, vehicle_type, is_ev, is_fcev, is_ice, sales_url, " \
-              "displacement) " \
+              "displacement,code) " \
               "values " \
               "(%(id)s, %(data_date)s, %(data_year)s, %(data_month)s, %(rank)s, %(brand_lv1)s, %(brand_lv2)s, " \
               "%(price_min)s, %(price_max)s, %(sales_num)s, %(vehicle_type)s, %(is_ev)s, %(is_fcev)s, %(is_ice)s, " \
-              "%(sales_url)s, %(displacement)s)"
+              "%(sales_url)s, %(displacement)s,%(code)s)"
         x = utils.update_many(conn, sql, data_arr)
         logging.info(f"{x} inserted")
 
@@ -198,6 +227,7 @@ def get_sales_detail_html(url):
 
 def get_energy_type(td_arr):
     """
+    此方法已经弃用
     获取能源类型
     todo 如果一次获取多个月的数据, 这个方法会重复执行, 需要建立缓存
     :param td_arr:
@@ -273,6 +303,7 @@ def get_energy_type2(td_arr):
     is_ev = '1' if len(joinev) > 0 else '0'
     is_fcev = '1' if len(joinfcev) > 0 else '0'
 
+    time.sleep(2)
     return {
         "is_ev": is_ev,
         "is_ice": is_ice,
@@ -322,12 +353,23 @@ def handle_one_month(vehicle_type, date):
         brand_lv2 = td_arr[1].text
         price_min, price_max = get_price(td_arr[2].text)
         sales_num = td_arr[4].text
-        energy_type = get_energy_type2(td_arr)
+        # get_energy_type2 是二次爬取,性能差,取消,20240919
+        # energy_type = get_energy_type2(td_arr)
+        # 默认值
+        energy_type = {
+            "is_ev": '',
+            "is_ice": '',
+            "is_fcev": '',
+            "url": '',
+            "displacement": ''
+        }
         is_ev = energy_type['is_ev']
         is_ice = energy_type['is_ice']
         is_fcev = energy_type['is_fcev']
         sales_url = energy_type['url']
         displacement = energy_type['displacement']
+        # 链接信息,/salescar/sg27043/ -> sg27043, 得到唯一值
+        code = td_arr[1].a["href"].replace("/salescar/", "").replace("/", "")
 
         # logging.info(f'{id}, {rank}, {brand_lv1}, {brand_lv2}, {price_min},
         # {price_max}, {sales_num}')
@@ -347,21 +389,27 @@ def handle_one_month(vehicle_type, date):
             "is_ice": is_ice,
             "is_fcev": is_fcev,
             "sales_url": sales_url,
-            "displacement": displacement
+            "displacement": displacement,
+            "code": code,
         })
 
     logging.info(f'data len: {len(all)}')
-    save_db(all)
+    # save_db(all)
+    save_vehcile_info(all)
 
 
 def run():
     snowflake_init()
+    # 当前时间
     d = datetime.datetime.strptime(start, '%Y-%m')
     while True:
+        # 3个车类型: 轿车, suv, mpv
         for i in vtype:
+            # 处理一个月的数据
             handle_one_month(i, d)
             logging.info("processing")
             time.sleep(3)
+        # 加一个月
         d = d + relativedelta(months=1)
         d2 = d.strftime('%Y-%m')
 
@@ -407,5 +455,244 @@ class MysqlProp:
         self.mysql_pass = kwargs['mysql_pass']
 
 
+def query_vehicle_info():
+    """
+    本地的车辆信息
+    todo x天未更新在内存里进行, 不在sql
+    :return:
+    """
+    sql = f"select * from test.vehicle_info"
+    with utils.connect(mysql_host, mysql_port, mysql_user, mysql_pass) as conn:
+        return dbutils.query_list(conn, sql)
+
+
+def parse_engergy(content_xpath):
+    # 能源类型
+    types_raw = content_xpath.xpath('//div[@class="energy-type-item-container"]/span/text()')
+    # types 是array 要剔重
+    return ','.join(set(types_raw))
+
+
+def resolve_xpath(content_xpath, value):
+    return content_xpath.xpath(value)
+
+
+def is_number(str):
+    return re.match("^[+-]?\d+(\.\d+)?$", str.strip()) is not None
+
+
+def get_vehicle_info(code):
+    """
+    获取车辆信息
+    :param code:
+    :return:
+    """
+
+    def get_html_xpath(url):
+        """
+        获取配置页面里的所有能源类型,剔重
+        :param url:
+        :return: 剔重set
+        """
+        # 获取渲染后的HTML
+        rendered_html = get_url_headless(url)
+        # with open(code + '.html', 'w', encoding='utf-8') as iiio:
+        #     iiio.write(rendered_html)
+
+        # rendered_html = ''
+        # with open(code + '.html', 'r', encoding='utf-8') as io:
+        #     rendered_html = io.read()
+
+        html = etree.HTML(rendered_html, etree.HTMLParser(encoding='utf-8'))
+        return html
+
+    # 用selenium爬取页面, 得到页面代码的xpath对象
+    url = f'{site_domain}/{code}/config.html'
+    content_xpath = get_html_xpath(url)
+
+    # 暂无参培结果
+    empty_description = resolve_xpath(content_xpath, '//p[@class="baseEmpty-description"]/text()')
+    if len(empty_description) > 0:
+        if '暂无' in empty_description[0]:
+            logging.info('暂无参数配置')
+            return None
+
+    # 能源类型
+    energy_type = parse_engergy(content_xpath)
+    brand_lv1 = resolve_xpath(content_xpath, '//div[@id="common-breadcrumbs"]/a[3]/text()')[0]
+    brand_lv2 = resolve_xpath(content_xpath, '//div[@id="common-breadcrumbs"]/a[4]/text()')[0]
+    price_list = resolve_xpath(content_xpath,
+                               '//div[@class="table-wrapper mr-10 w-fit"]/div[1]/div[1]/div[@class="table-cell"]/div[1]/div[@class="official-price"]/span[@class="price"]/text()')
+    # price_list过滤掉不是数字的项
+    price_list = sorted([x.replace('万', '') for x in price_list])  # 排序
+    price_list = list(filter(is_number, price_list))
+    price_min = int(Decimal(price_list[0]) * 10000)  # 最低
+    price_max = int(Decimal(price_list[-1]) * 10000)  # 最高
+    # int(Decimal(x) * 10000)
+    length = resolve_xpath(content_xpath,
+                           '//div[@data-key="wcLength"]/div[@class="table-cell"]/div[1]/div[1]/text()')[0].strip()
+    width = resolve_xpath(content_xpath,
+                          '//div[@data-key="wcWidth"]/div[@class="table-cell"]/div[1]/div[1]/text()')[0].strip()
+    height = resolve_xpath(content_xpath,
+                           '//div[@data-key="wcHeight"]/div[@class="table-cell"]/div[1]/div[1]/text()')[0].strip()
+    # 轴距
+    wheelbase = resolve_xpath(content_xpath,
+                              '//div[@data-key="wcZj"]/div[@class="table-cell"]/div[1]/div[1]/text()')[0].strip()
+    # 车门数
+    gate_count = resolve_xpath(content_xpath,
+                               '//div[@data-key="gateCount"]/div[@class="table-cell"]/div[1]/div[1]/text()')[0].strip()
+    # 座位数
+    seat_count = resolve_xpath(content_xpath,
+                               '//div[@data-key="rjBzzw"]/div[@class="table-cell"]/div[1]/div[1]/text()')[0].strip()
+    # 车重kg
+    weight = resolve_xpath(content_xpath,
+                           '//div[@data-key="wcCszl"]/div[@class="table-cell"]/div[1]/div[1]/text()')
+    weight = list(filter(is_number, map(lambda v: v.strip(), weight)))
+    if len(weight) > 0:
+        weight = weight[0]
+    else:
+        weight = 0
+    # 排量
+    displacement = resolve_xpath(content_xpath,
+                                 '//div[@data-key="yqPlcc"]/div[@class="table-cell"]/div[1]/div[1]/text()')
+    if displacement:
+        displacement = ','.join(set([v.strip() for v in displacement]))
+    else:
+        displacement = ''
+    # 进气:自然吸气,涡轮增压
+    inlet = resolve_xpath(content_xpath,
+                          '//div[@data-key="yqZylx"]/div[@class="table-cell"]/div[1]/div[1]/text()')
+    if inlet:
+        inlet = inlet[0].strip()
+    else:
+        inlet = ''
+    # 发动机功率
+    engine_power = resolve_xpath(content_xpath,
+                                 '//div[@data-key="yqGl#1"]/div[@class="table-cell"]/div[1]/div[1]/text()')
+    if engine_power:
+        engine_power = ','.join(set([v.strip() for v in engine_power]))
+    else:
+        engine_power = ''
+    # 电动机功率
+    motor_power = resolve_xpath(content_xpath,
+                                '//div[@data-key="ddZdgl#1"]/div[@class="table-cell"]/div[1]/div[1]/text()')
+    if motor_power:
+        motor_power = ','.join(set([v.strip() for v in motor_power]))
+    else:
+        motor_power = ''
+
+    # gateCount rjBzzw wcCszl yqZylx
+    val = {
+        "code": code,
+        "brand_lv1": brand_lv1,
+        "brand_lv2": brand_lv2,
+        "price_min": price_min,
+        "price_max": price_max,
+        "vehicle_type": '',
+        "length": length,
+        "width": width,
+        "height": height,
+        "wheelbase": wheelbase,
+        "gate_count": gate_count,
+        "seat_count": seat_count,
+        "energy_type": energy_type,
+        "weight": weight,
+        "displacement": displacement,
+        "inlet": inlet,
+        "engine_power": engine_power,
+        "motor_power": motor_power,
+        "sales_url": url,
+    }
+    logging.info(val)
+
+    return val
+
+
+def update_vehcile_info(info):
+    with utils.connect(mysql_host, mysql_port, mysql_user, mysql_pass) as conn:
+        sql = (
+            "UPDATE `test`.`vehicle_info` SET `code` = %(code)s, `brand_lv1` = %(brand_lv1)s, `brand_lv2` = %(brand_lv2)s, "
+            "`price_min` = %(price_min)s, `price_max` = %(price_max)s, `vehicle_type` = %(vehicle_type)s, `length` = %(length)s, "
+            "`width` = %(width)s, `height` = %(height)s, `wheelbase` = %(wheelbase)s, `gate_count` = %(gate_count)s, `seat_count` = %(seat_count)s, "
+            "`energy_type` = %(energy_type)s, `weight` = %(weight)s, `displacement` = %(displacement)s, `inlet` = %(inlet)s, "
+            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s "
+            "WHERE `id` = %(id)s;")
+        x = utils.update(conn, sql, info)
+        logging.info(f"{x} updated")
+
+
+def insert_vehcile_info(info):
+    with utils.connect(mysql_host, mysql_port, mysql_user, mysql_pass) as conn:
+        sql = (
+            "INSERT INTO `test`.`vehicle_info` (`id`, `code`, `brand_lv1`, `brand_lv2`, `price_min`, `price_max`, "
+            "`vehicle_type`, `length`, `width`, `height`, `wheelbase`, `gate_count`, `seat_count`, `energy_type`, "
+            "`weight`, `displacement`, `inlet`, `engine_power`, `motor_power`, `sales_url`) VALUES (%(id)s, %(code)s, "
+            "%(brand_lv1)s, %(brand_lv2)s, %(price_min)s, %(price_max)s, %(vehicle_type)s, %(length)s, %(width)s, "
+            "%(height)s, %(wheelbase)s, %(gate_count)s, %(seat_count)s, %(energy_type)s, "
+            "%(weight)s, %(displacement)s, %(inlet)s, %(engine_power)s, %(motor_power)s, %(sales_url)s);")
+        x = utils.update(conn, sql, info)
+        logging.info(f"{x} inserted")
+
+
+def save_vehcile_info(api_list):
+    """
+    独立存储车辆基本信息
+    原有销量表不适合存车辆基本信息,比如能源类型/车辆类型等等
+    :param api_list: 爬取到的车辆排名数据
+    :return:
+    """
+    # 本地库的车辆列表, 如果api_list.code不在local_list里, 就为此code去爬取数据, 并写入数据库
+    local_list = query_vehicle_info()
+    # 需要update的, 单个元素是数据库表对象(tuple)
+    fetch_code_list_update = []
+    # 需要insert的, 单个元素是dict
+    fetch_code_list_insert = []
+    # 本地列表, 超过x天未更新就需要获取最新数据更新一下
+    for local in local_list:
+        update_time = local.update_time
+        # update_time是datetime类型 当前时间now()和update_time之间相差的时间
+        now_timestamp = int(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
+        update_time_timestamp = int(datetime.datetime.timestamp(update_time) * 1000)
+        # 预设值的毫秒
+        offset = vehcile_info_update_interval * 86400000
+        if now_timestamp - update_time_timestamp > offset:
+            # x天未更新过, 需要更新
+            info = get_vehicle_info(local.code)
+            if not info:
+                continue
+            info['id'] = local.id
+            update_vehcile_info(info)
+    # 排名数据里在本地不存在的code相当于是新车上市,有了销量, 也需要获取车辆信息
+    local_code_list = [v.code for v in local_list]
+    for api in api_list:
+        code = api['code']
+        if code not in local_code_list:
+            info = get_vehicle_info(code)
+            if not info:
+                continue
+            info['id'] = get_id()
+            info['vehicle_type'] = api['vehicle_type']
+            insert_vehcile_info(info)
+
+    # dmi, 奥迪a4, 海鸥
+    # code_list = ['sg24638', 'sg3524', 'sg28871']
+
+    # 既要add又要update
+
+    # for v in all:
+    #     if v['code'] not in code_list:
+    #         get_vehicle_info(v['code'])
+
+
+def run2():
+    today = datetime.datetime.now()
+    # today - 60 days
+    start_time = today - datetime.timedelta(days=180)
+    time_d = datetime.datetime.strftime(start_time, "%Y-%m-%d")
+    print(time_d)
+
+
 if __name__ == '__main__':
     run()
+
+    # save_vehcile_info(1)
