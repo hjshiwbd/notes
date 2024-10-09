@@ -8,8 +8,8 @@ var clog = console.log
 var params = {
   'ss': { //订阅profileName的名字
     srcGroup: 'Auto', //复制原有代理组name
-    destGroup: '!负载均衡', //复制后新代理组name
-    destGroupType: 'load-balance', //复制后新代理组type
+    destGroup: 'Fallback', //复制后新代理组name
+    destGroupType: 'fallback', //复制后新代理组type
     baseGroup: 'Proxy', //基础group,需要手动选择的那个,
     proxiesFilters: [{ //过滤器
       type: 'wildcard', // 通配符匹配,满足value格式的都会被过滤掉
