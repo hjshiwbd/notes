@@ -15,7 +15,7 @@ CREATE TABLE `vehicle_info` (
   `height` int(11) NOT NULL DEFAULT '-1' COMMENT '高mm',
   `wheelbase` int(11) NOT NULL DEFAULT '-1' COMMENT '轴距mm',
   `gate_count` int(11) NOT NULL DEFAULT '-1' COMMENT '车门数',
-  `seat_count` int(11) NOT NULL DEFAULT '-1' COMMENT '座位数',
+  `seat_count` varchar(32) COLLATE utf8mb4_bin NOT NULL DEFAULT '-1' COMMENT '座位数',
   `energy_type` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '能源类型',
   `weight` int(11) NOT NULL DEFAULT '-1' COMMENT '车身重量kg',
   `displacement` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '排量',
