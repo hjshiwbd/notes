@@ -661,6 +661,7 @@ def save_vehcile_info(api_list):
             if not info:
                 continue
             info['id'] = local.id
+            info['vehicle_type'] = local.vehicle_type
             update_vehcile_info(info)
     # 排名数据里在本地不存在的code相当于是新车上市,有了销量, 也需要获取车辆信息
     local_code_list = [v.code for v in local_list]
