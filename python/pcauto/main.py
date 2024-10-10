@@ -225,94 +225,6 @@ def get_sales_detail_html(url):
         return r.text
 
 
-def get_energy_type(td_arr):
-    """
-    此方法已经弃用
-    获取能源类型
-    todo 如果一次获取多个月的数据, 这个方法会重复执行, 需要建立缓存
-    :param td_arr:
-    :return:
-    """
-    td = td_arr[1]
-    url = f'{site_domain}{td.a["href"]}'
-    raw = get_sales_detail_html(url)
-    # time.sleep(3)
-    html = etree.HTML(raw, etree.HTMLParser(encoding='utf-8'))
-    # 排量
-    types = html.xpath('//div[@class="fl s-data-l"]/p[1]/em/a/text()')
-    # 电动, 燃油, 氢燃料
-    is_ev = '0'
-    is_ice = '0'
-    is_fcev = '0'
-    for v in types:
-        if '氢燃料' in v:
-            is_fcev = '1'
-        elif '电动' in v:
-            is_ev = '1'
-        elif re.match(r'^\d+\.\d+[TLtl]$', v):
-            # ice=内燃机, v满足正则 1.0T 或者 1.0L
-            is_ice = '1'
-    # print(types)
-    # all_type.update(types)
-    return {
-        "is_ev": is_ev,
-        "is_ice": is_ice,
-        "is_fcev": is_fcev,
-        "url": url,
-        "displacement": json.dumps(types, ensure_ascii=False)
-    }
-
-
-def get_energy_type2(td_arr):
-    """
-    换个源头来获取能源类型, 老方法get_energy_type()获取的不准
-    :param td_arr:
-    :return:
-    """
-
-    def get_engery_types(url):
-        """
-        获取配置页面里的所有能源类型,剔重
-        :param url:
-        :return: 剔重set
-        """
-        # 获取渲染后的HTML
-        rendered_html = get_url_headless(url)
-        # energy-type-item-container
-        html = etree.HTML(rendered_html, etree.HTMLParser(encoding='utf-8'))
-        # 排量
-        types = html.xpath('//div[@class="energy-type-item-container"]/span/text()')
-        div_text = html.xpath('//div[@class="js-table-row table-row"]/div[0][text()="发动机"]')
-
-        # types 是array 要剔重
-        return {"energy_type": set(types)}
-
-    # https://price.pcauto.com.cn/sg27043/config.html
-    td = td_arr[1]
-    # /salescar/sg27043/ -> /sg27043/
-    url = f'{site_domain}{td.a["href"].replace("/salescar", "")}config.html'
-
-    rr = get_engery_types(url)
-    types = rr["energy_type"]
-
-    # types和各类型的交集
-    joinice = arr_join(types, ice_types)
-    joinev = arr_join(types, ev_types)
-    joinfcev = arr_join(types, fcev_types)
-    is_ice = '1' if len(joinice) > 0 else '0'
-    is_ev = '1' if len(joinev) > 0 else '0'
-    is_fcev = '1' if len(joinfcev) > 0 else '0'
-
-    time.sleep(2)
-    return {
-        "is_ev": is_ev,
-        "is_ice": is_ice,
-        "is_fcev": is_fcev,
-        "url": url,
-        "displacement": ''
-    }
-
-
 def arr_join(arr1, arr2):
     """
     2个数组求交集
@@ -353,8 +265,6 @@ def handle_one_month(vehicle_type, date):
         brand_lv2 = td_arr[1].text
         price_min, price_max = get_price(td_arr[2].text)
         sales_num = td_arr[4].text
-        # get_energy_type2 是二次爬取,性能差,取消,20240919
-        # energy_type = get_energy_type2(td_arr)
         # 默认值
         energy_type = {
             "is_ev": '',
@@ -394,7 +304,7 @@ def handle_one_month(vehicle_type, date):
         })
 
     logging.info(f'data len: {len(all)}')
-    # save_db(all)
+    save_db(all)
     save_vehcile_info(all)
 
 
@@ -520,7 +430,7 @@ def get_vehicle_info(code):
     # 能源类型
     energy_type = parse_engergy(content_xpath)
     brand_lv1 = resolve_xpath(content_xpath, '//div[@id="common-breadcrumbs"]/a[3]/text()')[0]
-    brand_lv2 = resolve_xpath(content_xpath, '//div[@id="common-breadcrumbs"]/a[4]/text()')[0]
+    brand_lv2 = resolve_xpath(content_xpath, '//div[@id="common-breadcrumbs"]/a[last()]/text()')[0]
     price_list = resolve_xpath(content_xpath,
                                '//div[@class="table-wrapper mr-10 w-fit"]/div[1]/div[1]/div[@class="table-cell"]/div[1]/div[@class="official-price"]/span[@class="price"]/text()')
     # price_list过滤掉不是数字的项
@@ -675,15 +585,6 @@ def save_vehcile_info(api_list):
             info['vehicle_type'] = api['vehicle_type']
             insert_vehcile_info(info)
 
-    # dmi, 奥迪a4, 海鸥
-    # code_list = ['sg24638', 'sg3524', 'sg28871']
-
-    # 既要add又要update
-
-    # for v in all:
-    #     if v['code'] not in code_list:
-    #         get_vehicle_info(v['code'])
-
 
 def run2():
     today = datetime.datetime.now()
@@ -694,6 +595,6 @@ def run2():
 
 
 if __name__ == '__main__':
-    run()
+    # run()
 
-    # save_vehcile_info(1)
+    save_vehcile_info([])
