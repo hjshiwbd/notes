@@ -10,7 +10,7 @@ from email.utils import formataddr
 
 from bs4 import BeautifulSoup
 
-import utils1
+import utils
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s|%(levelname)s|%(process)d|%(filename)s.%(lineno)d|%(message)s',
@@ -24,7 +24,7 @@ toggle_rate = 0.9
 def from_remote(url):
     # s = curl_get(book_index_url).decode('gbk')
     # url = 'http://www.google.com'
-    s = utils1.curl_get(url, proxy=False, gzip=True, timeout=60, headers={
+    r = utils.get_url(url, proxy=False, gzip=True, timeout=60, headers={
         "authority": "t66y.com",
         "method": "GET",
         "path": "/thread0806.php?fid=25",
@@ -35,8 +35,9 @@ def from_remote(url):
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-    }).decode('utf-8')
-    return s
+    })
+
+    return r.text
 
 
 def from_local():
@@ -107,7 +108,8 @@ def handle_single_page(url):
 
 
 def run():
-    url_base = 'https://www.dd373.com/s-eja7u2-0r2mut-cgkvu7-22bq81-0-0-jk5sj0-0-0-0-0-0-1-0-5-0.html'
+    # url_base = 'https://www.dd373.com/s-eja7u2-0r2mut-cgkvu7-22bq81-0-0-jk5sj0-0-0-0-0-0-1-0-5-0.html'
+    url_base = 'https://www.dd373.com/s-eja7u2-c-jk5sj0-3fk9tg-pe5bdm-1x48hs.html'
     handle_single_page(url_base)
     logging.info("done")
 
