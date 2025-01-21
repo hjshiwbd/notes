@@ -96,8 +96,8 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2024-08'
-end = '2024-08'
+start = '2024-09'
+end = '2024-12'
 
 # vehcle_type = {
 #     "car": "1",
@@ -525,7 +525,7 @@ def update_vehcile_info(info):
             "`price_min` = %(price_min)s, `price_max` = %(price_max)s, `vehicle_type` = %(vehicle_type)s, `length` = %(length)s, "
             "`width` = %(width)s, `height` = %(height)s, `wheelbase` = %(wheelbase)s, `gate_count` = %(gate_count)s, `seat_count` = %(seat_count)s, "
             "`energy_type` = %(energy_type)s, `weight` = %(weight)s, `displacement` = %(displacement)s, `inlet` = %(inlet)s, "
-            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s "
+            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s, update_time = now() "
             "WHERE `id` = %(id)s;")
         x = utils.update(conn, sql, info)
         logging.info(f"{x} updated")
@@ -567,6 +567,7 @@ def save_vehcile_info(api_list):
         offset = vehcile_info_update_interval * 86400000
         if now_timestamp - update_time_timestamp > offset:
             # x天未更新过, 需要更新
+            logging.info('update:' + local.code)
             info = get_vehicle_info(local.code)
             if not info:
                 continue
@@ -578,6 +579,7 @@ def save_vehcile_info(api_list):
     for api in api_list:
         code = api['code']
         if code not in local_code_list:
+            logging.info('insert:' + code)
             info = get_vehicle_info(code)
             if not info:
                 continue
