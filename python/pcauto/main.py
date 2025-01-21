@@ -163,7 +163,7 @@ def get_url_headless(url):
         web_driver.get(url)
 
         # 等待页面完全加载
-        web_driver.implicitly_wait(10)  # seconds
+        web_driver.implicitly_wait(3)  # seconds
 
         # 获取渲染后的HTML
         return web_driver.page_source
