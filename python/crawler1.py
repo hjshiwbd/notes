@@ -48,8 +48,8 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%y-%m-%d %H:%M:%S')
 
 # 69c.org
-# domain = "t66y.com"
-domain = "cl.2076y.xyz"
+domain = "t66y.com"
+#domain = "cf.pexnfb.vip"
 
 # is_from_local = True
 is_from_local = False
@@ -123,7 +123,7 @@ def from_remote(url):
 
     args = {
         "headers": header_old,
-        # "proxies": proxies
+        "proxies": proxies
     }
 
     r = get_url(url, **args)
