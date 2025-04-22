@@ -96,7 +96,7 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2025-01'
+start = '2024-09'
 end = '2025-03'
 
 # vehcle_type = {
@@ -567,6 +567,7 @@ def save_vehcile_info(api_list):
         offset = vehcile_info_update_interval * 86400000
         if now_timestamp - update_time_timestamp > offset:
             # x天未更新过, 需要更新
+            logging.info('update:' + local.code)
             info = get_vehicle_info(local.code)
             if not info:
                 continue
@@ -578,6 +579,7 @@ def save_vehcile_info(api_list):
     for api in api_list:
         code = api['code']
         if code not in local_code_list:
+            logging.info('insert:' + code)
             info = get_vehicle_info(code)
             if not info:
                 continue

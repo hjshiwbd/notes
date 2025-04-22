@@ -48,8 +48,8 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%y-%m-%d %H:%M:%S')
 
 # 69c.org
-# domain = "t66y.com"
-domain = "cl.2076y.xyz"
+domain = "t66y.com"
+#domain = "cf.pexnfb.vip"
 
 # is_from_local = True
 is_from_local = False
@@ -123,7 +123,7 @@ def from_remote(url):
 
     args = {
         "headers": header_old,
-        # "proxies": proxies
+        "proxies": proxies
     }
 
     r = get_url(url, **args)
@@ -213,9 +213,9 @@ SELECT * FROM crawler.`t66y_article` where original_id in (%s)
 def get_id_from_href(href):
     # https://t66y.com/htm_data/1908/25/3618874.html
     # https://t66y.com/read.php?tid=3618875
-    if href.startswith('htm_data'):
+    if href.startswith('/htm_data'):
         # "/"到".html"之间的数字,即其原文id)
-        return href.split("/")[3][0:-5]
+        return href.split("/")[4][0:-5]
     else:
         key = "tid="
         start = href.index(key) + len(key)
