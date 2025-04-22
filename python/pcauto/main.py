@@ -96,8 +96,8 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2024-08'
-end = '2024-08'
+start = '2025-01'
+end = '2025-03'
 
 # vehcle_type = {
 #     "car": "1",
@@ -525,7 +525,7 @@ def update_vehcile_info(info):
             "`price_min` = %(price_min)s, `price_max` = %(price_max)s, `vehicle_type` = %(vehicle_type)s, `length` = %(length)s, "
             "`width` = %(width)s, `height` = %(height)s, `wheelbase` = %(wheelbase)s, `gate_count` = %(gate_count)s, `seat_count` = %(seat_count)s, "
             "`energy_type` = %(energy_type)s, `weight` = %(weight)s, `displacement` = %(displacement)s, `inlet` = %(inlet)s, "
-            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s "
+            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s, update_time = now() "
             "WHERE `id` = %(id)s;")
         x = utils.update(conn, sql, info)
         logging.info(f"{x} updated")
@@ -595,6 +595,6 @@ def run2():
 
 
 if __name__ == '__main__':
-    # run()
+    run()
 
-    save_vehcile_info([])
+    # save_vehcile_info([])
