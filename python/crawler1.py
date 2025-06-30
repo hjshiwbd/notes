@@ -162,7 +162,7 @@ def resolve_html(page_obj):
 
 
 def get_conn():
-    return utils.connect('localhost', 3306, 'root', 'root')
+    return utils.connect('localhost', 3306, 'root', '123456')
 
 
 def save_my_db(sqls):
