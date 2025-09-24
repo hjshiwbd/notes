@@ -2,6 +2,7 @@
 class Param:
     use_proxy = False
     xpath_chapter_url = ''
+    time_sleep_per_page = 3
 
     def __init__(self):
         pass
@@ -203,3 +204,36 @@ class BiquxsCom(Param):
     def get_chapter_title(self, str):
         arr = str.split('_')
         return arr[0]
+
+
+class Biquge700(Param):
+    """
+    https://www.biquge700.com/Book/23/23803/  目录
+    https://www.biquge700.com/Book/23/23803/16766006.html 内容
+    """
+    use_proxy = False
+    site_index = "https://www.biquge700.com"
+    # 列表页
+    novel_list_url = site_index + '/Book/23/23803/'
+    # 字符集
+    # novel_site_encoding = 'utf-8'
+    novel_site_encoding = 'gbk'
+    # 列表页: 小说名称
+    xpath_novel_name = '//meta[@property="og:title"]/@content'
+    # 列表页: 小说作者
+    xpath_novel_author = '//meta[@property="og:novel:author"]/@content'
+    # 列表页: 小说章节地址
+    xpath_chapter_url = '//div[@id="list"]/dl/dd/a/@href'
+    # 内容页: 小说章节标题
+    xpath_chapter_title = '//title/text()'
+    # 内容页: 小说章节内容
+    xpath_chapter_content = '//div[@id="content"]/text()'
+    time_sleep_per_page = 0.5
+    
+    def get_url(self, url):
+        return self.site_index + url
+
+    def get_chapter_title(self, str):
+        arr = str.split('_')
+        arr2 = arr[0].split(':')
+        return arr2[1]
