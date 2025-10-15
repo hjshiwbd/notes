@@ -1,6 +1,8 @@
 # coding:utf-8
 """
 使用了无头浏览器, 需要有访问Google的能力才能运行本程序
+chromedriver下载
+https://registry.npmmirror.com/binary.html?path=chrome-for-testing/
 
 CREATE TABLE `vehicle_info` (
   `id` bigint(20) NOT NULL,
