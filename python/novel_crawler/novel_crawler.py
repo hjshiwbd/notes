@@ -32,11 +32,11 @@ from lxml import etree
 from param import *
 
 # 把上面属性放到一个对象里面
-param = BiquxsCom()
+param = Biquge700()
 # param = Jingshuzhijia()
 
-# from_remote = False
-from_remote = True
+from_remote = False
+# from_remote = True
 
 conn = None
 
@@ -71,10 +71,10 @@ def save_or_query_queue(list2, book_id):
     :return:
     """
     arr = []
-    sql = 'select url from crawler.novel_queue where book_id = %(bookId)s and status = \'new\''
+    sql = "select url from crawler.novel_queue where book_id = %(bookId)s and status = 'new'"
     list = utils.query_list(conn, sql, {'bookId': book_id})
     if len(list) > 0:
-        return [x.url for x in list]
+        return [x['url'] for x in list]
     else:
         for i in range(0, len(list2)):
             # insert 爬取进度表
@@ -140,6 +140,7 @@ def run():
     else:
         txt = utils.read_file('list.html', encoding=param.novel_site_encoding)
 
+    # logging.info('list page html:' + txt)
     html = etree.HTML(txt, etree.HTMLParser(encoding=param.novel_site_encoding))
 
     # use xpath to get novel name
@@ -167,7 +168,7 @@ def run():
         kwargs.update(param.__dict__)
         r2 = http_get(param.get_url(chapter_url), **kwargs)
         count = count + 1
-        # logging.info(r2.text)
+        # logging.info('content page html:' + r2.text)
         html2 = etree.HTML(r2.text, etree.HTMLParser(encoding=param.novel_site_encoding))
         chapter_title = html2.xpath(param.xpath_chapter_title)[0]
         chapter_title = param.get_chapter_title(chapter_title)
@@ -182,10 +183,10 @@ def run():
         output_str = ''
 
         update_page_ok(param.novel_list_url, chapter_url)
-        # time.sleep(3)
+        time.sleep(param.time_sleep_per_page)
 
 
 if __name__ == '__main__':
     utils.setup_logger('novel_crawler')
-    with utils.connect('localhost', 3306, 'root', 'root') as conn:
+    with utils.connect('localhost', 3306, 'root', '123456') as conn:
         run()

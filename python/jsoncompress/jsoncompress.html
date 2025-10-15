@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>json compress</title>
+</head>
+<body>
+	
+	<div>
+		<div>压缩前</div>
+		<textarea rows="20" cols="150" id="json1"></textarea>
+
+	</div>
+	<div>
+		<div>压缩后</div>
+		<textarea rows="20" cols="150" id="json2"></textarea>
+	</div>
+	<div>
+		<button style="width: 100px; height: 48px;" onclick="onCompress()">压缩</button>
+	</div>
+
+<script>
+	function onCompress() {
+		let json1 = document.getElementById('json1').value
+		let o = JSON.parse(json1)
+		let json2 = JSON.stringify(o)
+		document.getElementById('json2').value = json2
+	}
+</script>
+</body>
+</html>
