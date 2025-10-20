@@ -1,6 +1,8 @@
 # coding:utf-8
 """
 使用了无头浏览器, 需要有访问Google的能力才能运行本程序
+chromedriver下载
+https://registry.npmmirror.com/binary.html?path=chrome-for-testing/
 
 CREATE TABLE `vehicle_info` (
   `id` bigint(20) NOT NULL,
@@ -96,8 +98,8 @@ mysql_pass = 'hH01KgJMPbVJcYbNAzp@oVe9DdbL4Usg'
 
 site_domain = 'https://price.pcauto.com.cn'
 
-start = '2025-04'
-end = '2025-05'
+start = '2025-06'
+end = '2025-09'
 
 # vehcle_type = {
 #     "car": "1",
@@ -565,6 +567,7 @@ def save_vehcile_info(api_list):
     # 需要insert的, 单个元素是dict
     fetch_code_list_insert = []
     # 本地列表, 超过x天未更新就需要获取最新数据更新一下
+    index = 0
     for local in local_list:
         update_time = local.update_time
         # update_time是datetime类型 当前时间now()和update_time之间相差的时间
@@ -574,7 +577,8 @@ def save_vehcile_info(api_list):
         offset = vehcile_info_update_interval * 86400000
         if now_timestamp - update_time_timestamp > offset:
             # x天未更新过, 需要更新
-            logging.info('update:' + local.code)
+            index = index + 1
+            logging.info(f'{index}/{len(local_list)} update:{local.code}')
             info = get_vehicle_info(local.code)
             if not info:
                 continue
@@ -583,10 +587,12 @@ def save_vehcile_info(api_list):
             update_vehcile_info(info)
     # 排名数据里在本地不存在的code相当于是新车上市,有了销量, 也需要获取车辆信息
     local_code_list = [v.code for v in local_list]
+    index2 = 0
     for api in api_list:
         code = api['code']
         if code not in local_code_list:
-            logging.info('insert:' + code)
+            index2 = index2 + 1
+            logging.info(f'{index2}/{len(api_list)} insert:{code}')
             info = get_vehicle_info(code)
             if not info:
                 continue
