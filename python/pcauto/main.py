@@ -490,6 +490,12 @@ def get_vehicle_info(code):
         motor_power = ','.join(set([v.strip() for v in motor_power]))
     else:
         motor_power = ''
+    # cltc续航
+    cltc = resolve_xpath(content_xpath, '//div[@data-key="ddCltc#1"]/div[@class="table-cell"]/div[1]/div[1]/text()')
+    if cltc:
+        cltc = ','.join(set([v.strip() for v in cltc]))
+    else:
+        cltc = ''
 
     # gateCount rjBzzw wcCszl yqZylx
     val = {
@@ -512,6 +518,7 @@ def get_vehicle_info(code):
         "engine_power": engine_power,
         "motor_power": motor_power,
         "sales_url": url,
+        "cltc": cltc,
     }
     logging.info(val)
 
@@ -525,7 +532,7 @@ def update_vehcile_info(info):
             "`price_min` = %(price_min)s, `price_max` = %(price_max)s, `vehicle_type` = %(vehicle_type)s, `length` = %(length)s, "
             "`width` = %(width)s, `height` = %(height)s, `wheelbase` = %(wheelbase)s, `gate_count` = %(gate_count)s, `seat_count` = %(seat_count)s, "
             "`energy_type` = %(energy_type)s, `weight` = %(weight)s, `displacement` = %(displacement)s, `inlet` = %(inlet)s, "
-            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s, update_time = now() "
+            "`engine_power` = %(engine_power)s, `motor_power` = %(motor_power)s, `sales_url` = %(sales_url)s, update_time = now(),cltc = %(cltc)s "
             "WHERE `id` = %(id)s;")
         x = utils.update(conn, sql, info)
         logging.info(f"{x} updated")
@@ -536,10 +543,10 @@ def insert_vehcile_info(info):
         sql = (
             "INSERT INTO `test`.`vehicle_info` (`id`, `code`, `brand_lv1`, `brand_lv2`, `price_min`, `price_max`, "
             "`vehicle_type`, `length`, `width`, `height`, `wheelbase`, `gate_count`, `seat_count`, `energy_type`, "
-            "`weight`, `displacement`, `inlet`, `engine_power`, `motor_power`, `sales_url`) VALUES (%(id)s, %(code)s, "
+            "`weight`, `displacement`, `inlet`, `engine_power`, `motor_power`, `sales_url`,cltc) VALUES (%(id)s, %(code)s, "
             "%(brand_lv1)s, %(brand_lv2)s, %(price_min)s, %(price_max)s, %(vehicle_type)s, %(length)s, %(width)s, "
             "%(height)s, %(wheelbase)s, %(gate_count)s, %(seat_count)s, %(energy_type)s, "
-            "%(weight)s, %(displacement)s, %(inlet)s, %(engine_power)s, %(motor_power)s, %(sales_url)s);")
+            "%(weight)s, %(displacement)s, %(inlet)s, %(engine_power)s, %(motor_power)s, %(sales_url)s),%(cltc)s;")
         x = utils.update(conn, sql, info)
         logging.info(f"{x} inserted")
 
