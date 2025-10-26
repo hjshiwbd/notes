@@ -60,6 +60,7 @@ pip install pysnowflake
 pip install BeautifulSoup4
 pip install html5lib
 pip install python-dateutil
+pip install selenium
 """
 
 import os
@@ -611,6 +612,6 @@ def run2():
 
 
 if __name__ == '__main__':
-    run()
+    # run()
 
-    # save_vehcile_info([])
+    save_vehcile_info([])
