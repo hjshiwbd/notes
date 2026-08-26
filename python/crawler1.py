@@ -37,7 +37,7 @@ import time
 import traceback
 
 import requests
-import utils
+import utils2 as utils
 from bs4 import BeautifulSoup
 import urllib.request
 import urllib3
@@ -162,7 +162,7 @@ def resolve_html(page_obj):
 
 
 def get_conn():
-    return utils.connect('localhost', 3306, 'root', '123456')
+    return utils.connect('192.168.2.115', 3306, 'yuzhi_dev', 'uJWRdqU0W84qBoSJWOIeHM136e8YTvk@')
 
 
 def save_my_db(sqls):
