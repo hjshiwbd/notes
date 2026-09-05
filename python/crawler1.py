@@ -49,7 +49,7 @@ logging.basicConfig(level=logging.INFO,
 
 # 69c.org
 domain = "t66y.com"
-#domain = "cf.pexnfb.vip"
+# domain = "cf.pexnfb.vip"
 
 # is_from_local = True
 is_from_local = False
@@ -187,10 +187,10 @@ def get_sql(exist_id_list, articles):
     for o in articles:
         if int(o['id']) not in exist_id_list:
             sql = """
-                INSERT INTO `crawler`.`t66y_article` (`fid`,`original_id`, `title`, `author_name`, `post_date`, `link` )
-            VALUES	( '%s','%s','%s','%s','%s','%s');
+                INSERT INTO `crawler`.`t66y_article` (`fid`,`original_id`, `title`, `author_name`, `post_date`, `link`, `download_count` )
+            VALUES	( '%s','%s','%s','%s','%s','%s','%s');
                 """.strip().replace("\n", "") % (
-                str(fid), o['id'], o['title'], o['author'], o['create_date'], o['href'])
+                str(fid), o['id'], o['title'], o['author'], o['create_date'], o['href'], str(o['download_count']))
             result.append(sql)
     return result
 
@@ -290,13 +290,16 @@ def handle_single_page(url):
         # print(len(tds[1]))
         author = tds[2].a.get_text()
         create_date = get_create_date_v2304(tds)
+        # 下载数量,fid21无,其他有
+        download_count = 0 if 'fid=21' in url else (tds[4].get_text().strip())
         # print(create_date)
         o = {
             "id": id,
             "href": href,
             "title": title,
             "author": author,
-            'create_date': create_date
+            'create_date': create_date,
+            'download_count': download_count
         }
         articles.append(o)
 
