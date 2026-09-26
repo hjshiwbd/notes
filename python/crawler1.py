@@ -33,6 +33,7 @@ pip3 install bs4  mysql-connector-python
 """
 
 import logging
+import re
 import time
 import traceback
 
@@ -292,6 +293,8 @@ def handle_single_page(url):
         create_date = get_create_date_v2304(tds)
         # 下载数量,fid21无,其他有
         download_count = 0 if 'fid=21' in url else (tds[4].get_text().strip())
+        if not is_integer(download_count):
+            download_count = 0
         # print(create_date)
         o = {
             "id": id,
@@ -307,6 +310,13 @@ def handle_single_page(url):
     sqls = get_sql(exist_id_list, articles)
     return save_my_db(sqls)
 
+
+def is_integer(s: str) -> bool:
+    """
+    是否正整数
+    """
+    pattern = re.compile(r'^\d+$')
+    return bool(pattern.fullmatch(s))
 
 def get_queue():
     """
